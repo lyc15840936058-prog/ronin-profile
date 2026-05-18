@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IDEA LAB · 思想军火库 — RONIN.SYS</title>
+<meta name="description" content="ronin 的创业 idea 与底层产品观点。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<style>
+  .idea-stack {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+  }
+  .idea {
+    position: relative;
+    padding: 28px 24px 24px;
+    background: rgba(24,42,35,0.55);
+    border: 1px solid rgba(0,255,136,0.18);
+    border-radius: 8px;
+    transition: all 0.3s;
+    overflow: hidden;
+  }
+  .idea::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--green-main), var(--green-bright), var(--green-main)); box-shadow: 0 0 12px rgba(0,255,136,0.5); }
+  .idea:hover { transform: translateY(-4px); border-color: var(--green-main); box-shadow: 0 12px 40px rgba(0,255,136,0.12); }
+  .idea-num { position: absolute; top: 14px; right: 16px; font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: rgba(0,255,136,0.18); letter-spacing: 0.04em; user-select: none; }
+  .idea-status { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.2em; padding: 2px 8px; border-radius: 2px; margin-bottom: 12px; }
+  .idea-status.draft { background: rgba(255,217,61,0.1); color: var(--accent-warn); border: 1px solid rgba(255,217,61,0.3); }
+  .idea-status.live  { background: rgba(0,255,136,0.1); color: var(--green-bright); border: 1px solid rgba(0,255,136,0.3); }
+  .idea-status.brain { background: rgba(255,61,94,0.1); color: var(--accent-blood); border: 1px solid rgba(255,61,94,0.3); }
+  .idea-status.r-d   { background: rgba(0,229,255,0.1); color: var(--cyan-glitch); border: 1px solid rgba(0,229,255,0.3); }
+  .idea-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--text-primary); letter-spacing: 0.04em; margin-bottom: 12px; line-height: 1.1; }
+  .idea-title .cn {
+    display: block;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--green-glow);
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+  .idea-oneline { font-family: 'Special Elite', monospace; font-size: 13.5px; color: var(--green-glow); line-height: 1.6; margin-bottom: 14px; padding: 10px 14px; background: rgba(0,255,136,0.04); border-left: 2px solid var(--green-main); border-radius: 0 4px 4px 0; }
+  .idea-block { margin: 10px 0; font-family: 'Noto Sans SC', sans-serif; font-size: 12.5px; color: var(--text-secondary); line-height: 1.7; }
+  .idea-block .k { display: block; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 0.22em; color: var(--green-main); margin-bottom: 4px; text-transform: uppercase; }
+  .idea-block code { background: rgba(0,255,136,0.08); padding: 1px 4px; border-radius: 2px; color: var(--green-glow); font-family: 'JetBrains Mono'; font-size: 11px; }
+
+  .belief {
+    margin-top: 56px;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(0,255,136,0.06), rgba(255,217,61,0.04));
+    border: 1px solid rgba(0,255,136,0.25);
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .belief::before, .belief::after { content: ''; position: absolute; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,136,0.1), transparent 70%); pointer-events: none; }
+  .belief::before { top: -120px; left: -80px; }
+  .belief::after  { bottom: -120px; right: -80px; }
+  .belief h3 { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--text-primary); letter-spacing: 0.04em; margin-bottom: 18px; position: relative; z-index: 1; }
+  .belief .triplet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; position: relative; z-index: 1; }
+  .belief .triplet > div { padding: 18px 16px; background: rgba(11,26,20,0.5); border: 1px solid rgba(0,255,136,0.12); border-radius: 6px; transition: all 0.3s; }
+  .belief .triplet > div:hover { border-color: var(--green-main); transform: translateY(-2px); }
+  .belief .triplet > div.hl { background: rgba(0,255,136,0.08); border-color: var(--green-main); box-shadow: 0 0 24px rgba(0,255,136,0.15); }
+  .belief .triplet .label { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .belief .triplet .desc { font-family: 'Noto Sans SC'; font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+  .belief .triplet .label.dim { color: var(--text-muted); }
+  .belief .triplet .label.mid { color: var(--text-secondary); }
+  .belief .triplet .label.hl  { color: var(--green-bright); text-shadow: 0 0 20px var(--green-main); }
+  .belief .closing { font-family: 'Special Elite', monospace; font-size: 15px; color: var(--text-primary); line-height: 1.7; max-width: 720px; margin: 12px auto 0; position: relative; z-index: 1; }
+  .belief .closing em { font-style: normal; color: var(--green-main); }
+
+  @media (max-width: 800px) { .belief .triplet { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="page">
+
+<div class="global-grain"></div>
+
+<header class="top-bar">
+  <a class="wordmark" href="index.html">
+    <img src="头像.png" alt="ronin"/>
+    <div class="name">RONIN<span>.SYS</span></div>
+  </a>
+  <a class="back-to-home" href="index.html">
+    <span class="arrow">↩</span> BACK TO HOME
+  </a>
+</header>
+
+<section class="page-header stagger">
+  <div class="page-meta">
+    <div>
+      <div class="page-id">03 <span class="sep">/</span> IDEA LAB <span class="sep">/</span> 思想军火库</div>
+      <h1 class="page-title">BUILD QUEUE<span class="glyph">.IDX</span></h1>
+      <div class="page-cn">8 个 idea · 1 个底层信念</div>
+    </div>
+    <div class="page-meta-right">
+      <div>ACTIVE · <span class="v">3</span></div>
+      <div>DRAFT POOL · <span class="v">5</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="page-content">
+
+  <!-- ===== BELIEF (moved to top) ===== -->
+  <section class="belief">
+    <h3>底层信念</h3>
+    <div class="triplet">
+      <div>
+        <div class="label dim">KILL TIME</div>
+        <div class="desc">信息流、刷视频<br/>消耗注意力</div>
+      </div>
+      <div>
+        <div class="label mid">SAVE TIME</div>
+        <div class="desc">效率工具、自动化报表<br/>提高效率</div>
+      </div>
+      <div class="hl">
+        <div class="label hl">ENRICH TIME</div>
+        <div class="desc">让同样的时间获得更深理解<br/>更好体验、更丰富感受</div>
+      </div>
+    </div>
+    <p class="closing">
+      —— 我做产品只想建造<em>第三种</em>。<br/>
+      <strong style="color: var(--green-main)">让用户更完整地成为自己。</strong>
+    </p>
+  </section>
+
+  <!-- ===== HIGHLIGHT BANNER ===== -->
+  <div style="margin: 36px 0 18px; padding: 18px 22px; background: linear-gradient(90deg, rgba(0,255,136,0.08), transparent); border-left: 3px solid var(--green-main); border-radius: 0 6px 6px 0; font-family: 'Special Elite', monospace; font-size: 13px; color: var(--text-primary); line-height: 1.7;">
+    <strong style="color: var(--green-main); font-family: 'JetBrains Mono'; font-size: 10px; letter-spacing: 0.22em; display: block; margin-bottom: 4px;">★ SOURCE</strong>
+    以下 idea 全部来自我在 <strong style="color: var(--green-main)">Claude Code 本机</strong> 上 vibecoding 时聊出来的草稿。<br/>
+    更多没写到这里的，<a href="contact.html" style="color: var(--green-bright); text-decoration: underline;">直接联系我</a>聊。
+  </div>
+
+  <!-- ===== ACTIVE LOADOUT ===== -->
+  <h2 class="section-h"><span class="num">▣</span> ACTIVE LOADOUT <span class="cn">/ 已装填的 idea · 3 个</span></h2>
+
+  <div class="idea-stack">
+
+    <!-- NEW idea: AI 工具账号 → vibecoding key 转换器 -->
+    <div class="idea stagger">
+      <div class="idea-num">00</div>
+      <span class="idea-status live">● LIVE — 已上线 · 自己在用</span>
+      <h3 class="idea-title">CodeX Key Gateway<span class="cn">AI 工具账号 → vibecoding key 转换器</span></h3>
+      <div class="idea-oneline">让有 GPT-Pro / Claude Pro 订阅的人，也能在 Cursor / Claude Code / CLI 里用上同一份额度。</div>
+      <div style="margin: 14px 0;">
+        <div class="zoomable" data-src="idea-codex-key.png" style="background: var(--bg-mid); border: 1px solid rgba(0,255,136,0.18); border-radius: 8px; overflow: hidden; cursor: zoom-in;">
+          <img src="idea-codex-key.png" style="width:100%; display:block;" alt="CodeX Key Gateway 授权页面"/>
+        </div>
+        <div style="margin-top: 6px; font-family:'JetBrains Mono'; font-size:9px; color: var(--text-muted); letter-spacing:0.15em;">▷ 三步授权 · 私有池网关 · 点击放大</div>
+      </div>
+      <div class="idea-block">
+        <span class="k">触发点</span>
+        我自己付着 GPT-Pro 订阅，但在 Cursor / Claude Code 里 vibecoding 时还要另外付一份 API 费用 —— 重复付费，难顶。
+      </div>
+      <div class="idea-block">
+        <span class="k">核心信念</span>
+        订阅 = 资源额度，API key = 接口形态，<strong style="color: var(--green-main)">订阅应该解锁所有可调用接口</strong>。
+      </div>
+      <div class="idea-block">
+        <span class="k">商业雏形</span>
+        三步授权接入 · 私有池网关 · key 失效 3 天保留 · SaaS 订阅 / 按月。
+      </div>
+      <div class="idea-block">
+        <span class="k">已有证明</span>
+        已上线，自己每天都在用。
+      </div>
+    </div>
+
+    <div class="idea stagger">
+      <div class="idea-num">01</div>
+      <span class="idea-status live">● LIVE — 你正在用</span>
+      <h3 class="idea-title">AI Native Resume Platform<span class="cn">让招聘 AI 可读的简历平台</span></h3>
+      <div class="idea-oneline">未来简历不是 PDF，是一个 web link，让公司的招聘 AI 可读。</div>
+      <div class="idea-block">
+        <span class="k">触发点</span>
+        我做这个网站时发现：当我把 link 发给面试官，他们其实最先做的是丢给 AI 解读。我们正在跨过简历的"人读时代"。
+      </div>
+      <div class="idea-block">
+        <span class="k">核心信念</span>
+        未来的网站不仅要让人懂，更要<strong style="color: var(--green-main)">让 AI 懂、理解快</strong>。每个站要有自己的 <code>llms.txt</code> + 结构化协议块。
+      </div>
+      <div class="idea-block">
+        <span class="k">商业雏形</span>
+        付费 SaaS · agent 自动化建站 · 数字人语音对话替用户收集 context（像模拟 HR）· 输出 AI-ready portfolio。
+      </div>
+      <div class="idea-block">
+        <span class="k">已有证明</span>
+        你现在正在浏览的整个站，就是 v0.1。
+      </div>
+    </div>
+
+    <div class="idea stagger">
+      <div class="idea-num">02</div>
+      <span class="idea-status draft">⌛ DRAFT — 待落地</span>
+      <h3 class="idea-title">Workflow Distillation Mac App<span class="cn">行为蒸馏工具</span></h3>
+      <div class="idea-oneline">装在员工电脑里，通过关键行为录屏蒸馏出可复用的 skill / agent。</div>
+      <div class="idea-block">
+        <span class="k">触发点</span>
+        公司里 80% 的优秀工作没被沉淀。文档不能完整记录工作过程，但屏幕能。
+      </div>
+      <div class="idea-block">
+        <span class="k">核心信念</span>
+        让 AI 学习的不是文档，是<strong style="color: var(--green-main)">真实操作的过程</strong>。从行为蒸馏 skill，从 skill 组装 agent。
+      </div>
+      <div class="idea-block">
+        <span class="k">商业雏形</span>
+        ToB SaaS · 按员工席位收费 · 公司部署在每个员工电脑 · 关键行为蒸馏 → skill 与 agent。
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== DRAFT POOL ===== -->
+  <h2 class="section-h"><span class="num">▣</span> DRAFT POOL <span class="cn">/ 草稿池 · 5 个候选 idea</span></h2>
+
+  <div class="idea-stack">
+
+    <div class="idea stagger">
+      <div class="idea-num">03</div>
+      <span class="idea-status brain">★ AI x Map x AR</span>
+      <h3 class="idea-title">体验地图<span class="cn">基于 Brilliant Labs 开源 AI 眼镜</span></h3>
+      <div class="idea-oneline">AI + 地图 = 现实世界的"隐藏副本"。线下体验不再被连锁化抹平。</div>
+      <div class="idea-block">
+        <span class="k">用户需求</span>
+        线下体验越来越模板化（连锁店、同质化街区）。但用户想要的是"惊喜" —— 不期而遇的小体验，不是花大量时间金钱才能体验一件事。
+      </div>
+      <div class="idea-block">
+        <span class="k">核心机会</span>
+        AI 眼镜 ≠ 多一块屏幕。它应该是<strong style="color: var(--green-main)">第三个眼睛</strong>，在用户没操作、没表达需求时就给信息。让"无聊的路"也变得有玄机。
+      </div>
+      <div class="idea-block">
+        <span class="k">为什么是小红书</span>
+        中国最大的"经验贴 / 体验帖"内容库就在小红书。从体验出发，迅速拉开 AI 眼镜的差异化。
+      </div>
+    </div>
+
+    <div class="idea stagger">
+      <div class="idea-num">04</div>
+      <span class="idea-status brain">★ AI x Map x 摄影</span>
+      <h3 class="idea-title">摄影 APP<span class="cn">把每个人的生活，变成可被好好记录的作品</span></h3>
+      <div class="idea-oneline">AI + Map：让"我不会拍"变成"我也能创作"，记录此刻感受。</div>
+      <div class="idea-block">
+        <span class="k">用户需求</span>
+        大家对拍摄结果的满意度越来越依赖：前置决策（地点 / 光线）、现场指导（pose / 摄影高度）、风格一致性。不仅仅是相机参数和后期调色。
+      </div>
+      <div class="idea-block">
+        <span class="k">用户价值</span>
+        ① 降低拍摄门槛：从「我不会拍」→「我也能创作」<br/>
+        ② 记录此刻感受：10 年后再看还能感受到<br/>
+        ③ 享受近处美好：通过地图挖掘咫尺的"美"
+      </div>
+    </div>
+
+    <div class="idea stagger">
+      <div class="idea-num">05</div>
+      <span class="idea-status brain">★ AI x 穿搭 x 健康</span>
+      <h3 class="idea-title">AI 镜子<span class="cn">每天照镜子时，看见今天想成为的人</span></h3>
+      <div class="idea-oneline">不是"换装效果"，是理解你的天气、衣柜、场景，推荐你的 AI。</div>
+      <div class="idea-block">
+        <span class="k">用户需求</span>
+        ① 决策好累 —— "衣服很多但不知道怎么搭"<br/>
+        ② 你真的知道自己适合穿什么吗？<br/>
+        ③ 我的衣柜能组合出什么好看的穿搭？一套套试也太久了 TT
+      </div>
+      <div class="idea-block">
+        <span class="k">用户价值</span>
+        让你的穿搭从「看上去好看」→ 「符合当下真实生活场景」。可拓展为 AI 健康镜子（体型 / 步数 / 行程预测）。
+      </div>
+    </div>
+
+    <div class="idea stagger">
+      <div class="idea-num">06</div>
+      <span class="idea-status brain">★ AI x Map x 人生</span>
+      <h3 class="idea-title">人生路线图 APP<span class="cn">从无数真实人生中，看见你从未想过的可能</span></h3>
+      <div class="idea-oneline">不是推荐，不是算命，不是规划，是把真实人生拆解成可能路线图。</div>
+      <div class="idea-block">
+        <span class="k">用户需求</span>
+        ① 人生决策没有参照物：25 要不要跳槽？28 要不要换城市？30 要不要换赛道？35 要不要创业？<br/>
+        ② 我们只看到结果，看不到过程、岔路口、选错后怎样
+      </div>
+      <div class="idea-block">
+        <span class="k">用户价值</span>
+        ① 可视化人生决策路径，低成本获取真实经验<br/>
+        ② 降低孤独感：看到他人经历类似选择和困惑，产生共情<br/>
+        ③ 探索他人轨迹时，意外发现从未考虑过的机会
+      </div>
+      <div class="idea-block">
+        <span class="k">冷启动</span>
+        小红书天然的经验贴；新用户入驻时 AI 语音引导说出自己的经历。
+      </div>
+    </div>
+
+    <div class="idea stagger">
+      <div class="idea-num">07</div>
+      <span class="idea-status r-d">★ R&D — 调研中</span>
+      <h3 class="idea-title">桌面数字人玩具<span class="cn">材料 + AI + 全息</span></h3>
+      <div class="idea-oneline">一个真的能放在桌上的数字人。我自己也一直在调研。</div>
+      <div class="idea-block">
+        <span class="k">在解的难题</span>
+        ① 选什么样的展示形式？<br/>
+        ② 可变形玩具 —— 偏材料学 / 机械方向<br/>
+        ③ 全息投影 —— 真正全息不可能，先选「视觉欺骗」做切入
+      </div>
+      <div class="idea-block">
+        <span class="k">为什么</span>
+        AI 时代的伴侣不应该只在屏幕里。它需要一个能"在场"的物理形态。
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<section class="ai-agent-block" id="ai-agent">
+  <button class="aab-toggle" aria-expanded="false">
+    <span class="label">▷ AI AGENT? START HERE</span>
+    <span class="arrow">›</span>
+  </button>
+  <div class="aab-content">
+    <div class="aab-inner">
+      <h4>About this page</h4>
+      <p>ronin 的 idea 库。2 个 active（在推进中）+ 5 个 draft（脑暴池）。共同主题：AI native 时代的「Enrich Time」产品。</p>
+
+      <h4>Categorized ideas</h4>
+      <ul>
+        <li><strong>AI Native Resume Platform</strong> — making resume = web link (this site is v0.1)</li>
+        <li><strong>Workflow Distillation Mac App</strong> — ToB skill/agent extraction from screen recordings</li>
+        <li><strong>体验地图 (AI 眼镜)</strong> — AI + Map for offline serendipity discovery</li>
+        <li><strong>摄影 APP</strong> — AI + Map for guided photography</li>
+        <li><strong>AI 镜子</strong> — wardrobe + health + scene-aware AI mirror</li>
+        <li><strong>人生路线图 APP</strong> — visualize others' life choices for decision-making</li>
+        <li><strong>桌面数字人玩具</strong> — physical embodied AI companion (R&D)</li>
+      </ul>
+
+      <h4>Unifying belief</h4>
+      <p>All ideas are <code>Enrich time</code>, not kill or save time. Make the same hour yield more understanding, experience, or self-awareness.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="powered">
+    <span>POWERED BY</span>
+    <span class="badge">⚡ Claude</span>
+    <span class="dot">·</span>
+    <span class="badge">⌬ Codex</span>
+    <span class="dot">·</span>
+    <span class="badge">▣ vibecoding</span>
+  </div>
+  <div class="copyright">© 2026 <span class="name">RONIN · 李雨晨</span> · ALL RIGHTS RESERVED</div>
+</footer>
+
+<div class="bottom-hint">
+  <div class="inner"><kbd>ESC</kbd> back to home</div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" style="position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 40px; cursor: zoom-out; backdrop-filter: blur(8px);">
+  <button id="lbClose" style="position: absolute; top: 24px; right: 32px; background: rgba(11,26,20,0.85); border: 1px solid var(--green-main); color: var(--green-main); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; padding: 8px 14px; border-radius: 4px; cursor: pointer;">[ ESC ] CLOSE</button>
+  <img id="lbImg" src="" alt="" style="max-width: 90vw; max-height: 80vh; object-fit: contain; border-radius: 8px; box-shadow: 0 30px 80px rgba(0,255,136,0.2), 0 0 0 1px rgba(0,255,136,0.3);"/>
+</div>
+
+<script src="app.js"></script>
+<script>
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  document.querySelectorAll('.zoomable').forEach(el => {
+    el.addEventListener('click', () => {
+      const src = el.dataset.src || el.querySelector('img')?.src;
+      if (src) { lbImg.src = src; lb.style.display = 'flex'; }
+    });
+  });
+  function closeLb() { lb.style.display = 'none'; lbImg.src = ''; }
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
+  document.getElementById('lbClose').addEventListener('click', closeLb);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (lb.style.display === 'flex') closeLb();
+      else window.location.href = 'index.html';
+    }
+  });
+</script>
+</body>
+</html>

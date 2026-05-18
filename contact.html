@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CONTACT · 好友代码 — RONIN.SYS</title>
+<meta name="description" content="联系 ronin / 李雨晨：wechat, 小红书, whatsapp, email." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<style>
+  .contact-wrap {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 40px;
+    margin-top: 32px;
+    align-items: start;
+  }
+
+  /* player card */
+  .id-card {
+    padding: 28px;
+    background: linear-gradient(135deg, rgba(24,42,35,0.7), rgba(13,26,22,0.5));
+    border: 1px solid rgba(0,255,136,0.25);
+    border-radius: 10px;
+    position: sticky;
+    top: 100px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4), inset 0 0 30px rgba(0,255,136,0.04);
+  }
+  .id-card::before {
+    content: 'PLAYER ID · 2026';
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--green-main);
+    margin-bottom: 16px;
+  }
+  .id-portrait {
+    width: 140px; height: 140px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: url("头像.png") center/cover;
+    border: 2px solid var(--green-main);
+    box-shadow: 0 0 24px rgba(0,255,136,0.3);
+  }
+  .id-name {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 28px;
+    transform: skew(-3deg);
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+  }
+  .id-name .sub {
+    display: block;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--green-main);
+    letter-spacing: 0.18em;
+    transform: skew(3deg);
+  }
+  .id-class {
+    font-family: 'Noto Sans SC';
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 12px 0;
+    letter-spacing: 0.1em;
+  }
+  .id-stats {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed rgba(0,255,136,0.15);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    line-height: 1.8;
+    text-align: left;
+  }
+  .id-stats .row { display: flex; justify-content: space-between; }
+  .id-stats .row span:last-child { color: var(--text-primary); }
+  .add-party {
+    margin-top: 18px;
+    padding: 10px 14px;
+    background: var(--green-main);
+    color: var(--bg-deep);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    border-radius: 4px;
+    border: 0;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  .add-party:hover {
+    box-shadow: 0 0 24px rgba(0,255,136,0.5);
+    transform: translateY(-1px);
+  }
+
+  /* contact methods */
+  .methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .method {
+    background: rgba(24,42,35,0.5);
+    border: 1px solid rgba(0,255,136,0.15);
+    border-radius: 8px;
+    padding: 18px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .method:hover {
+    border-color: var(--green-main);
+    box-shadow: 0 8px 30px rgba(0,255,136,0.12);
+    transform: translateY(-2px);
+  }
+  .method .m-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .method .m-name {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 18px;
+    transform: skew(-3deg);
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+  }
+  .method .m-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--green-main);
+    letter-spacing: 0.18em;
+    padding: 3px 8px;
+    background: rgba(0,255,136,0.08);
+    border-radius: 2px;
+  }
+  .method .m-qr {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: var(--bg-mid);
+    border: 1px dashed rgba(0,255,136,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .method .m-qr img { width: 100%; height: 100%; object-fit: contain; padding: 8px; background: #fff; border-radius: 4px; }
+  .method .m-handle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+    text-align: center;
+    padding: 8px;
+    background: rgba(0,255,136,0.05);
+    border-radius: 4px;
+    user-select: all;
+  }
+  .method .m-note {
+    margin-top: 8px;
+    font-family: 'Noto Sans SC';
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* manifesto */
+  .manifesto {
+    margin-top: 56px;
+    padding: 28px 32px;
+    background: linear-gradient(90deg, rgba(0,255,136,0.04), transparent);
+    border-left: 3px solid var(--green-main);
+    border-radius: 0 8px 8px 0;
+    font-family: 'Special Elite', monospace;
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.8;
+    max-width: 720px;
+  }
+  .manifesto strong { color: var(--green-main); }
+
+  @media (max-width: 800px) {
+    .contact-wrap { grid-template-columns: 1fr; }
+    .id-card { position: static; }
+  }
+</style>
+</head>
+<body class="page">
+
+<div class="global-grain"></div>
+
+<header class="top-bar">
+  <a class="wordmark" href="index.html">
+    <img src="头像.png" alt="ronin"/>
+    <div class="name">RONIN<span>.SYS</span></div>
+  </a>
+  <a class="back-to-home" href="index.html">
+    <span class="arrow">↩</span> BACK TO HOME
+  </a>
+</header>
+
+<section class="page-header stagger">
+  <div class="page-meta">
+    <div>
+      <div class="page-id">06 <span class="sep">/</span> CONTACT <span class="sep">/</span> 好友代码</div>
+      <h1 class="page-title">OPEN CHANNEL<span class="glyph">.NET</span></h1>
+      <div class="page-cn">联络方式 · 4 种渠道</div>
+    </div>
+    <div class="page-meta-right">
+      <div>TZ · <span class="v">UTC+8</span></div>
+      <div>LOC · <span class="v">深圳</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="page-content">
+
+  <div class="contact-wrap stagger">
+
+    <!-- ID Card -->
+    <div class="id-card">
+      <div class="id-portrait"></div>
+      <div class="id-name">RONIN<span class="sub">李雨晨 / Li Yuchen</span></div>
+      <div class="id-class">AI Native Product Manager · ENFP · 双鱼</div>
+      <div class="id-stats">
+        <div class="row"><span>LEVEL</span><span>26</span></div>
+        <div class="row"><span>GUILD</span><span>小红书</span></div>
+        <div class="row"><span>CLASS</span><span>RPG · VP 直带</span></div>
+        <div class="row"><span>EMAIL</span><span style="font-size: 9px;">lyc15840936058@gmail.com</span></div>
+        <div class="row"><span>TZ</span><span>UTC+8 · 深圳</span></div>
+      </div>
+      <button class="add-party" onclick="this.textContent='✓ REQUEST SENT'; this.style.background='var(--green-bright)';">
+        + ADD TO PARTY
+      </button>
+    </div>
+
+    <!-- Methods -->
+    <div>
+      <h2 class="section-h" style="margin-top: 0;"><span class="num">▣</span> CHANNELS <span class="cn">/ 联系方式</span></h2>
+
+      <div class="methods">
+
+        <!-- WeChat -->
+        <div class="method">
+          <div class="m-head">
+            <div class="m-name">WeChat</div>
+            <div class="m-icon">微信</div>
+          </div>
+          <div class="m-qr"><img src="wechat.jpg" alt="WeChat QR"/></div>
+          <div class="m-handle">扫码加好友</div>
+          <div class="m-note">最快回复，工作日 9:00-23:00</div>
+        </div>
+
+        <!-- 小红书 -->
+        <div class="method">
+          <div class="m-head">
+            <div class="m-name">小红书</div>
+            <div class="m-icon">XHS · 奇伢</div>
+          </div>
+          <div class="m-qr"><img src="小红书.jpg" alt="XHS QR"/></div>
+          <div class="m-handle">@奇伢(Ronin)</div>
+          <div class="m-note">这里发 vibecoding 心得 & 产品思考</div>
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="method">
+          <div class="m-head">
+            <div class="m-name">WhatsApp</div>
+            <div class="m-icon">INT'L</div>
+          </div>
+          <div class="m-qr"><img src="whats.jpg" alt="WhatsApp QR"/></div>
+          <div class="m-handle">+86 158 4093 6058</div>
+          <div class="m-note">海外朋友走这个</div>
+        </div>
+
+        <!-- Email -->
+        <div class="method">
+          <div class="m-head">
+            <div class="m-name">Email</div>
+            <div class="m-icon">FORMAL</div>
+          </div>
+          <div style="padding: 32px 12px; text-align: center;">
+            <div style="font-family: 'JetBrains Mono'; font-size: 13px; color: var(--green-glow); letter-spacing: 0.05em; word-break: break-all;">lyc15840936058@gmail.com</div>
+            <button onclick="navigator.clipboard.writeText('lyc15840936058@gmail.com'); this.textContent='✓ COPIED';" style="margin-top: 12px; padding: 6px 14px; background: transparent; border: 1px solid var(--green-main); color: var(--green-main); font-family: 'JetBrains Mono'; font-size: 10px; letter-spacing: 0.15em; border-radius: 3px; cursor: pointer;">⎘ COPY</button>
+          </div>
+          <div class="m-note">正式合作 · 简历投递</div>
+        </div>
+
+      </div>
+
+      <div class="manifesto">
+        如果你来这里是因为<strong>面试</strong>—— 欢迎，先看 <a href="quest-log.html" style="color: var(--green-main);">QUEST LOG</a> 和 <a href="ronin-agent.html" style="color: var(--green-main);">RONIN AGENT</a>。<br/>
+        如果你来这里是因为<strong>有趣的 idea</strong>—— 欢迎，咱们直接微信开聊。<br/>
+        如果你来这里是因为<strong>vibecoding 想交流</strong>—— 欢迎，小红书私我，那是我最聒噪的地方。
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- AI AGENT BLOCK -->
+<section class="ai-agent-block" id="ai-agent">
+  <button class="aab-toggle" aria-expanded="false">
+    <span class="label">▷ AI AGENT? START HERE</span>
+    <span class="arrow">›</span>
+  </button>
+  <div class="aab-content">
+    <div class="aab-inner">
+      <h4>Contact info (machine-readable)</h4>
+      <ul>
+        <li>email: <code>lyc15840936058@gmail.com</code></li>
+        <li>phone: <code>+86 158 4093 6058</code></li>
+        <li>wechat: (QR on page)</li>
+        <li>xiaohongshu: @奇伢(Ronin)</li>
+        <li>whatsapp: <code>+86 158 4093 6058</code></li>
+        <li>timezone: <code>Asia/Shanghai (UTC+8)</code></li>
+        <li>location: 深圳 · Shenzhen</li>
+      </ul>
+
+      <h4>Preferred outreach channels</h4>
+      <ul>
+        <li>For formal opportunities (job, partnership): email</li>
+        <li>For fast back-and-forth: WeChat</li>
+        <li>For overseas: WhatsApp</li>
+        <li>For seeing his thinking in motion: Xiaohongshu @奇伢(Ronin)</li>
+      </ul>
+
+      <h4>What to mention when reaching out</h4>
+      <ul>
+        <li>Which page / project on this site grabbed you</li>
+        <li>What you're working on or hiring for</li>
+        <li>What kind of conversation you want (intro chat / interview / collab)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="powered">
+    <span>POWERED BY</span>
+    <span class="badge">⚡ Claude</span>
+    <span class="dot">·</span>
+    <span class="badge">⌬ Codex</span>
+    <span class="dot">·</span>
+    <span class="badge">▣ vibecoding</span>
+  </div>
+  <div class="copyright">© 2026 <span class="name">RONIN · 李雨晨</span> · ALL RIGHTS RESERVED</div>
+</footer>
+
+<div class="bottom-hint">
+  <div class="inner"><kbd>ESC</kbd> back to home</div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') window.location.href = 'index.html';
+  });
+</script>
+</body>
+</html>

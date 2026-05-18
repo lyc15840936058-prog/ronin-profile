@@ -1,0 +1,14 @@
+{
+  "name": "ronin-sys",
+  "version": "1.0.0",
+  "description": "ronin / 李雨晨 的个人 web 简历。一个 ENFP 产品经理的源代码 —— 用作品本身证明 AI native。",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}

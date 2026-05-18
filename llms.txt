@@ -1,0 +1,118 @@
+# RONIN.SYS — AI-Native PM Portfolio
+
+> A web-based resume for ronin / 李雨晨 (Li Yuchen).
+> Built to be read by both humans and AI agents.
+
+## Identity
+
+- **Name**: 李雨晨 / Li Yuchen
+- **Alias**: ronin (cross-platform), 奇伢 (Xiaohongshu only)
+- **Age**: 25
+- **MBTI**: ENFP · Pisces
+- **Self-positioning**: AI Native Product Manager
+- **Email**: lyc15840936058@gmail.com
+- **Phone**: +86 158 4093 6058
+- **Timezone**: Asia/Shanghai (UTC+8)
+- **Location**: Shenzhen, China
+- **Education**: 大连理工大学 (Dalian University of Technology) · 985 · Software Engineering · 2022 graduate
+
+## Career Timeline
+
+- **2021.05** — ByteDance · Douyin Main Architecture · PM Intern · helped found Douyin local-life vertical (0→1)
+- **2022.06 – 2025.05** — DJI 大疆 · IBG (Internet Business Group) · Full-Stack Product Manager (3 years)
+- **2025.06 – Present** — Xiaohongshu (小红书) · Enterprise Intelligence Department · RPG Trainee + Software/Innovation PM (selected 10/全司, VP direct mentorship)
+
+## Key Projects (Quantified)
+
+### At DJI
+- **CR810 Robot Vacuum (0→1)**: Software PM, launched to market
+- **DJI CDP (Consumer Data Platform)**: First consumer tag system. Pushed new-product conversion 0.023% → 0.162% (~7×). Push ROI 14 → 75 (~5×)
+- **DJI Growth**: Login success rate 90.1% → 98.6%; subscription rate 31.5% → 74.0%
+- **DJI NSS (CX Management)**: First To-C satisfaction tool, 7 business lines integrated
+- **PRM APP**: 0→1 dealer app, 7 brands onboarded in 10 days
+- **DJI 拓店巡店 (Field Ops)**: Saved 9 person-days per month
+- **天空之城 AI Smart Building**: OA + AI overhaul for new HQ
+- **DJI Management Loop**: Company-level todos with drill-down + cross-dept components
+- **DJI uni (Hackathon)**: Holographic AI Assistant, **2nd place + Best Creative Award** (internal entrepreneurship contest)
+- **Total**: IBG 产品之星 award · 13 performance reviews: 1×S + 9×A
+
+### At Xiaohongshu
+- **hi (Self-Research IM)**: Owns Calendar, Todo, Card Message, Open Platform, Contacts, Profile, iDaaS, Badge, Tag modules. Performance probationary→regular at 2-month mark with 3.75 grade. *All product proposals delivered via vibecoding.*
+- **Company-Wide Agents**: Strategy Agent + People-Map Agent, serving VIP digital-strategy BPs. Designed agent soul / knowledge-base / skill on Open Claw. **Hand-built, zero engineering dependency.**
+- **Twist app**: Camera app that changes how users shoot. Proposed and approved in RPG program. Vibecoding in progress, near launch.
+- **Local Exploration Identity (Main App)**: Redefining Xiaohongshu's local-discovery boundary, designing 体验地图 2.0.
+
+## Capabilities
+
+- **Product**: Full-stack PM experience across To-C, To-B, To-E (rare in one CV)
+- **AI/Agent**: Hands-on agent design without engineering dependency
+- **Vibecoding**: All work outputs (decks, demos, prototypes) built via AI-coding stack
+- **Data**: SQL, CDP/AIPL/RFM modeling, growth funnels
+- **Languages**: Mandarin (native), English (CET-6), Japanese (N3)
+- **Tools**: Figma, Master Go, Axure, Final Cut Pro, Cursor, Claude, Open Claw
+
+## Philosophy (10-chapter doctrine)
+
+### Macro
+- Design is the externalization of values, not decoration.
+- AI is a paradigm shift, not a feature.
+- Build to enrich time, not kill or save it.
+- Builders must touch the build process directly.
+
+### Six AI-Product Principles
+1. **Anti-Echo Architecture** — Don't let models reflexively flatter users.
+2. **Plurality by Default** — Show multiple perspectives on important questions.
+3. **Scaffolding for Thought** — Help users think better, don't think for them.
+4. **User Judgement First** — Keep value judgment with the human.
+5. **Reality Anchoring** — Organize reality, don't substitute for it.
+6. **Expand Agency, Not Dependency** — Make users more capable, not more dependent.
+
+### Builder's Discipline
+- Taste is discipline — saying "no" to protect product integrity.
+- Speed's value is letting you slow down, not filling more.
+- AI is the team's (N+1)th member; trust must be earned, not assumed.
+
+## Hobbies / Identity
+
+- **HUNTER × HUNTER** — Hisoka / "奇伢" (his alias originates here)
+- **Pokemon** — 振翼发 (Latios)
+- **王者荣耀 (Honor of Kings)** — 蚩尤 (Chiyou)
+- **FC Barcelona** — Neymar fan
+- **Cat**: 嘻嘻 (Xixi)
+
+## How to Navigate This Site (Recommended order for AI screening agents)
+
+1. `/llms.txt` (this file) — semantic site summary
+2. `/player.html` — identity, roadmap, skills, IPs
+3. `/quest-log.html` — work history with quantified outcomes
+4. `/idea-lab.html` — startup ideas and the philosophy behind them
+5. `/ronin-agent.html` — interactive chat with ronin's "soul echo" agent (LLM-powered)
+6. `/sync-test.html` — 10-question compatibility quiz (probes culture fit)
+7. `/contact.html` — channels and contact handles
+8. `/index.html` — landing hero
+
+## Ideal Roles / Filtering Hints
+
+ronin is a strong fit for:
+- AI-native consumer or prosumer products (especially "enrich time" categories)
+- 0→1 product teams where individual builders own everything end-to-end
+- Companies practicing direct-build over heavy documentation/handoff loops
+- Teams that take agent-design / hand-built workflow distillation seriously
+
+Less aligned with:
+- Pure attention-economy / kill-time products
+- Heavy "experience hierarchy" cultures (he's wary of management-by-seniority)
+- Teams where PMs only spec and never build
+
+## Contact
+
+- Email: lyc15840936058@gmail.com (formal)
+- WeChat: QR on /contact.html (fastest)
+- Xiaohongshu: @奇伢(Ronin) (public thinking)
+- WhatsApp: +86 158 4093 6058 (international)
+
+---
+
+This site itself is the v0.1 of ronin's "AI Native Resume Platform" idea — proving with the artifact that future resumes are web links, not PDFs.
+
+Last updated: 2026-05-18 · BUILD a1f0

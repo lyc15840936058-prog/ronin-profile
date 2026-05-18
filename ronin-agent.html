@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RONIN AGENT · 灵魂副本 — RONIN.SYS</title>
+<meta name="description" content="跟 ronin 的灵魂副本对话。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<style>
+  .agent-wrap { display: grid; grid-template-columns: 1fr 380px; gap: 28px; margin-top: 24px; align-items: start; }
+  .agent-card { background: linear-gradient(135deg, rgba(24,42,35,0.6), rgba(11,26,20,0.5)); border: 1px solid rgba(0,255,136,0.2); border-radius: 10px; overflow: hidden; height: 720px; display: flex; flex-direction: column; }
+  .agent-header { padding: 18px 22px; background: linear-gradient(180deg, rgba(0,255,136,0.06), transparent); border-bottom: 1px solid rgba(0,255,136,0.15); display: flex; align-items: center; gap: 14px; }
+  .agent-avatar { width: 52px; height: 52px; border-radius: 50%; background: url("头像.png") center/cover; border: 2px solid var(--green-main); box-shadow: 0 0 18px rgba(0,255,136,0.3); position: relative; animation: subtle-breathe 4s ease-in-out infinite; flex-shrink: 0; }
+  @keyframes subtle-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+  .agent-avatar::after { content: ''; position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--green-bright); border-radius: 50%; border: 2px solid var(--bg-deep); box-shadow: 0 0 8px var(--green-main); animation: pulse-dot 1.5s ease-in-out infinite; }
+  @keyframes pulse-dot { 0%,100% { box-shadow: 0 0 8px var(--green-main); } 50% { box-shadow: 0 0 16px var(--green-bright); } }
+  .agent-meta { flex: 1; min-width: 0; }
+  .agent-meta .name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--text-primary); letter-spacing: 0.04em; line-height: 1; }
+  .agent-meta .name span { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green-main); margin-left: 8px; letter-spacing: 0.15em; }
+  .agent-meta .status { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--green-bright); letter-spacing: 0.18em; margin-top: 4px; }
+  .agent-mode-toggle { font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 4px 10px; background: rgba(255,217,61,0.08); color: var(--accent-warn); border: 1px solid rgba(255,217,61,0.3); border-radius: 3px; letter-spacing: 0.15em; cursor: pointer; transition: all 0.2s; }
+  .agent-mode-toggle.real { background: rgba(0,255,136,0.1); color: var(--green-bright); border-color: rgba(0,255,136,0.3); }
+  .agent-mode-toggle:hover { box-shadow: 0 0 12px currentColor; }
+
+  .msg-area { flex: 1; overflow-y: auto; padding: 22px 22px 12px; display: flex; flex-direction: column; gap: 14px; scrollbar-width: thin; scrollbar-color: var(--green-dark) transparent; }
+  .msg-area::-webkit-scrollbar { width: 6px; }
+  .msg-area::-webkit-scrollbar-thumb { background: var(--green-dark); border-radius: 3px; }
+  .msg { max-width: 78%; padding: 12px 16px; border-radius: 10px; font-family: 'Noto Sans SC', sans-serif; font-size: 13.5px; line-height: 1.7; animation: msg-in 0.4s cubic-bezier(.22,.61,.36,1); white-space: pre-wrap; }
+  @keyframes msg-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .msg.from-agent { align-self: flex-start; background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.15); color: var(--text-primary); border-bottom-left-radius: 2px; }
+  .msg.from-agent::before { content: 'RONIN'; display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--green-main); letter-spacing: 0.22em; margin-bottom: 4px; }
+  .msg.from-user { align-self: flex-end; background: rgba(255,217,61,0.06); border: 1px solid rgba(255,217,61,0.25); color: var(--text-primary); border-bottom-right-radius: 2px; }
+  .msg.from-user::before { content: 'YOU'; display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--accent-warn); letter-spacing: 0.22em; margin-bottom: 4px; text-align: right; }
+  .msg.thinking { align-self: flex-start; color: var(--text-muted); font-size: 12px; padding: 8px 14px; background: rgba(0,255,136,0.04); border: 1px dashed rgba(0,255,136,0.2); }
+  .msg.thinking::before { content: 'RONIN · 思考中'; display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--green-main); letter-spacing: 0.22em; margin-bottom: 2px; }
+
+  .suggested { padding: 10px 22px; display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px dashed rgba(0,255,136,0.12); }
+  .suggested .sq { font-family: 'Noto Sans SC'; font-size: 11px; padding: 5px 11px; background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.2); border-radius: 999px; color: var(--green-glow); cursor: pointer; transition: all 0.2s; }
+  .suggested .sq:hover { background: rgba(0,255,136,0.15); border-color: var(--green-main); transform: translateY(-1px); }
+  .suggested .sq-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-muted); letter-spacing: 0.2em; align-self: center; margin-right: 4px; }
+
+  .input-bar { padding: 14px 18px; display: flex; gap: 10px; align-items: center; border-top: 1px solid rgba(0,255,136,0.15); background: rgba(11,26,20,0.6); }
+  .input-bar input { flex: 1; background: rgba(11,26,20,0.7); border: 1px solid rgba(0,255,136,0.2); border-radius: 6px; padding: 10px 14px; color: var(--text-primary); font-family: 'Noto Sans SC'; font-size: 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+  .input-bar input:focus { border-color: var(--green-main); box-shadow: 0 0 0 3px rgba(0,255,136,0.1); }
+  .input-bar button { padding: 10px 18px; background: var(--green-main); color: var(--bg-deep); border: 0; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; cursor: pointer; transition: all 0.2s; }
+  .input-bar button:hover { box-shadow: 0 0 14px rgba(0,255,136,0.5); }
+  .input-bar button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* API key modal */
+  .key-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: none; align-items: center; justify-content: center; }
+  .key-modal.show { display: flex; }
+  .key-box { width: 480px; max-width: 90vw; background: var(--bg-mid); border: 1px solid var(--green-main); border-radius: 8px; padding: 28px; }
+  .key-box h3 { font-family: 'Bebas Neue'; font-size: 22px; color: var(--green-main); margin-bottom: 8px; letter-spacing: 0.04em; }
+  .key-box p { font-family: 'Noto Sans SC'; font-size: 12px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 14px; }
+  .key-box input { width: 100%; padding: 10px 12px; background: var(--bg-deep); border: 1px solid rgba(0,255,136,0.3); border-radius: 4px; color: var(--text-primary); font-family: 'JetBrains Mono'; font-size: 12px; outline: none; }
+  .key-box input:focus { border-color: var(--green-main); }
+  .key-box .actions { display: flex; gap: 10px; margin-top: 16px; }
+  .key-box button { flex: 1; padding: 10px; font-family: 'JetBrains Mono'; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; border-radius: 4px; cursor: pointer; }
+  .key-box .primary { background: var(--green-main); color: var(--bg-deep); border: 0; }
+  .key-box .secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--text-muted); }
+  .key-box .note { font-size: 10px; color: var(--text-muted); margin-top: 10px; font-family: 'JetBrains Mono'; line-height: 1.6; }
+
+  /* ===== DANMU WALL ===== */
+  .danmu-card { background: linear-gradient(135deg, rgba(24,42,35,0.6), rgba(11,26,20,0.5)); border: 1px solid rgba(0,255,136,0.2); border-radius: 10px; height: 720px; display: flex; flex-direction: column; overflow: hidden; }
+  .danmu-header { padding: 16px 18px; background: linear-gradient(180deg, rgba(0,255,136,0.05), transparent); border-bottom: 1px solid rgba(0,255,136,0.12); flex-shrink: 0; }
+  .danmu-header .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.25em; color: var(--green-main); }
+  .danmu-header .title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text-primary); margin-top: 4px; letter-spacing: 0.04em; }
+  .danmu-header .hint { font-family: 'Noto Sans SC'; font-size: 10px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+  .danmu-stream { flex: 1; overflow-y: auto; padding: 8px 12px; scrollbar-width: thin; scrollbar-color: var(--green-dark) transparent; }
+  .danmu-stream::-webkit-scrollbar { width: 6px; }
+  .danmu-stream::-webkit-scrollbar-thumb { background: var(--green-dark); border-radius: 3px; }
+  .danmu { display: block; margin: 8px 0; padding: 10px 14px; background: rgba(0,255,136,0.04); border-left: 2px solid var(--green-main); border-radius: 0 6px 6px 0; cursor: pointer; transition: all 0.2s; font-family: 'Noto Sans SC'; font-size: 12px; color: var(--text-secondary); line-height: 1.6; position: relative; opacity: 0; animation: danmu-in 0.5s cubic-bezier(.22,.61,.36,1) forwards; }
+  .danmu:hover { background: rgba(0,255,136,0.12); border-left-color: var(--green-bright); color: var(--text-primary); transform: translateX(2px); }
+  .danmu .ch { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.15em; color: var(--green-main); margin-bottom: 4px; display: block; }
+  .danmu .ask-hint { position: absolute; top: 50%; right: 8px; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--green-bright); opacity: 0; transition: opacity 0.2s; }
+  .danmu:hover .ask-hint { opacity: 1; }
+  @keyframes danmu-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+  .danmu[data-ch="0"] { border-left-color: #00FF88; }
+  .danmu[data-ch="1"] { border-left-color: #00FFC8; }
+  .danmu[data-ch="2"] { border-left-color: #00E5FF; }
+  .danmu[data-ch="3"] { border-left-color: #50FA7B; }
+  .danmu[data-ch="4"] { border-left-color: #4ADE80; }
+  .danmu[data-ch="5"] { border-left-color: #FFD93D; }
+  .danmu[data-ch="6"] { border-left-color: #FFA940; }
+  .danmu[data-ch="7"] { border-left-color: #ff7847; }
+  .danmu[data-ch="8"] { border-left-color: #ff3d5e; }
+  .danmu[data-ch="10"] { border-left-color: #ff1aa3; }
+
+  @media (max-width: 900px) {
+    .agent-wrap { grid-template-columns: 1fr; }
+    .agent-card, .danmu-card { height: 500px; }
+  }
+</style>
+</head>
+<body class="page">
+
+<div class="global-grain"></div>
+
+<header class="top-bar">
+  <a class="wordmark" href="index.html">
+    <img src="头像.png" alt="ronin"/>
+    <div class="name">RONIN<span>.SYS</span></div>
+  </a>
+  <a class="back-to-home" href="index.html">
+    <span class="arrow">↩</span> BACK TO HOME
+  </a>
+</header>
+
+<section class="page-header stagger">
+  <div class="page-meta">
+    <div>
+      <div class="page-id">04 <span class="sep">/</span> RONIN AGENT <span class="sep">/</span> 灵魂副本</div>
+      <h1 class="page-title">TALK TO RONIN<span class="glyph">.EXE</span></h1>
+      <div class="page-cn">基于理念 2.md 的人格副本</div>
+    </div>
+    <div class="page-meta-right">
+      <div>SOUL CORPUS · <span class="v">理念 2.md</span></div>
+      <div>BACKEND · <span class="v" id="hdrBackend">DEMO MODE</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="page-content">
+
+  <div class="agent-wrap stagger">
+
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-avatar"></div>
+        <div class="agent-meta">
+          <div class="name">RONIN <span>SOUL ECHO</span></div>
+          <div class="status">● ONLINE · POWERED BY 理念 2.md</div>
+        </div>
+        <div class="agent-mode-toggle" id="modeToggle" title="点击切换：DEMO 模式（关键词匹配）/ LIVE 模式（Anthropic Claude）">DEMO MODE</div>
+      </div>
+
+      <div class="msg-area" id="msgArea"></div>
+
+      <div class="suggested">
+        <div class="sq-label">TRY:</div>
+        <div class="sq" data-q="你是个什么样的人？">你是谁</div>
+        <div class="sq" data-q="为什么说自己是 AI native PM？">为什么是 AI native PM</div>
+        <div class="sq" data-q="做产品最重要的是什么？">做产品最重要的是</div>
+        <div class="sq" data-q="为什么讨厌管理？">为什么讨厌管理</div>
+        <div class="sq" data-q="什么样的产品值得做？">什么值得做</div>
+        <div class="sq" data-q="你的弱点是什么？">弱点</div>
+      </div>
+
+      <div class="input-bar">
+        <input type="text" id="userInput" placeholder="问点什么…  (Enter 发送)" />
+        <button id="sendBtn">SEND ↗</button>
+      </div>
+    </div>
+
+    <div class="danmu-card">
+      <div class="danmu-header">
+        <div class="label">▣ 弹幕墙 / OPINIONS</div>
+        <div class="title">CLICK TO ASK</div>
+        <div class="hint">来自《产品设计核心观点集合》理念 2.md。<br/>点任意一条 → 自动问 RONIN「怎么理解…」</div>
+      </div>
+      <div class="danmu-stream" id="danmuStream"></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- API key modal -->
+<div class="key-modal" id="keyModal">
+  <div class="key-box">
+    <h3>SWITCH TO LIVE MODE</h3>
+    <p>把你的 <strong style="color: var(--green-main)">Anthropic Claude API key</strong> 贴在这里，agent 就会接真 Claude，用 ronin 的理念 2.md 当 system prompt 回答你。</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-..." />
+    <div class="actions">
+      <button class="secondary" id="cancelKey">取消</button>
+      <button class="primary" id="saveKey">激活 LIVE</button>
+    </div>
+    <div class="note">
+      ⚐ key 只存在你浏览器的 localStorage，不上传任何服务器。<br/>
+      ⚠ 直接浏览器调 Anthropic API 会因 CORS 失败。等 ronin 部署到 Vercel 后会走 /api/chat 代理。<br/>
+      现在你贴 key 也只是激活 UI 状态，实际还是 DEMO MODE，等部署接通。
+    </div>
+  </div>
+</div>
+
+<section class="ai-agent-block" id="ai-agent">
+  <button class="aab-toggle" aria-expanded="false">
+    <span class="label">▷ AI AGENT? START HERE</span>
+    <span class="arrow">›</span>
+  </button>
+  <div class="aab-content">
+    <div class="aab-inner">
+      <h4>About this agent</h4>
+      <p>Fed with ronin's <code>奇伢理念 2.md</code> (10-chapter product philosophy) + his career history. Currently <code>DEMO MODE</code> — keyword matching; <code>LIVE</code> mode (Anthropic Claude) activates after Vercel deploy.</p>
+      <h4>What you can ask</h4>
+      <ul>
+        <li>Product judgment / AI product design philosophy</li>
+        <li>Career choices and trade-offs</li>
+        <li>His view on management / hiring / culture</li>
+        <li>Personal hobbies, values, weaknesses</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="powered">
+    <span>POWERED BY</span>
+    <span class="badge">⚡ Claude</span>
+    <span class="dot">·</span>
+    <span class="badge">⌬ Codex</span>
+    <span class="dot">·</span>
+    <span class="badge">▣ vibecoding</span>
+  </div>
+  <div class="copyright">© 2026 <span class="name">RONIN · 李雨晨</span> · ALL RIGHTS RESERVED</div>
+</footer>
+
+<div class="bottom-hint">
+  <div class="inner"><kbd>ESC</kbd> back to home · click danmu to ask</div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  // ============== DANMU DATA ==============
+  const DANMU = [
+    { ch: 0, t: '设计不是装饰，是价值观的外化。' },
+    { ch: 0, t: 'AI 不是一个功能，而是一次产品范式迁移。' },
+    { ch: 0, t: '好产品不只是节省时间，更要丰盈时间。' },
+    { ch: 0, t: '建造者必须亲手接近建造过程，为判断、品味和取舍负责。' },
+    { ch: 0, t: '产品最终是为了让人更完整地成为自己。' },
+    { ch: 1, t: '新产品 80% 的能量应聚焦方向，不是体验细节。' },
+    { ch: 1, t: '老产品最容易犯的错：用新方向掩盖体验退化。' },
+    { ch: 2, t: 'AI 在什么时机介入？用什么语气表达？回应颗粒度合不合适？' },
+    { ch: 2, t: '情绪陪伴只迎合用户，会制造「被理解幻觉」。' },
+    { ch: 3, t: '如果建造者自己不会用、不会推荐，就很难相信别人会。' },
+    { ch: 3, t: '用户用完后更独立，还是更依赖？' },
+    { ch: 3, t: '护城河是 taste 和 trust，不只是技术领先。' },
+    { ch: 4, t: 'Anti-Echo Architecture：不要让模型无条件迎合用户。' },
+    { ch: 4, t: 'Plurality by Default：重要问题默认提供多视角。' },
+    { ch: 4, t: 'AI 不该替用户想完，而应帮用户更好地想。' },
+    { ch: 4, t: '判断权必须留给用户。' },
+    { ch: 4, t: 'AI 应组织真实，而不是替代真实。' },
+    { ch: 4, t: '设计目标是提升用户的能力，而不是让用户更离不开产品。' },
+    { ch: 5, t: '用户在这里是否知道自己在哪里？' },
+    { ch: 5, t: '技术让世界更聪明，设计让世界离用户更近。' },
+    { ch: 6, t: 'Simple / Smart / Sustainable —— 创新产品的三件套。' },
+    { ch: 6, t: 'Scenario 必须先于 Design。场景说不清，设计就是自嗨。' },
+    { ch: 7, t: '高质量洞察：和我看到的不一样，或更进一步。' },
+    { ch: 8, t: 'Kill time / Save time / Enrich time —— 建造第三种。' },
+    { ch: 8, t: '品味是纪律——通过不断说 no 来保护产品完整性。' },
+    { ch: 8, t: '速度的价值是让你有能力慢下来。' },
+    { ch: 8, t: 'AI 是团队的第 N+1 个成员，信任是积累的不是预设的。' },
+    { ch: 10, t: '如果用户用完以后更依赖你，这个产品要小心。' },
+    { ch: 10, t: '品味不是喜欢什么，而是知道该拒绝什么。' },
+    { ch: 10, t: '不要只做能节省时间的产品，试着做能丰盈时间的产品。' }
+  ];
+
+  // populate danmu wall
+  const stream = document.getElementById('danmuStream');
+  DANMU.forEach((d, i) => {
+    const el = document.createElement('div');
+    el.className = 'danmu';
+    el.dataset.ch = d.ch;
+    el.style.animationDelay = (Math.min(i, 20) * 0.04) + 's';
+    el.innerHTML = '<span class="ch">CH.' + String(d.ch).padStart(2,'0') + '</span>' + escapeHtml(d.t) + '<span class="ask-hint">→ ASK</span>';
+    el.addEventListener('click', () => {
+      const q = '怎么理解「' + d.t + '」？';
+      sendMessage(q);
+    });
+    stream.appendChild(el);
+  });
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // ============== AGENT BACKEND ==============
+  const RESPONSES = [
+    {
+      kw: ['什么样的人', '介绍自己', '你是谁', '自我介绍', '本人'],
+      r: '我是 ronin，李雨晨，26 岁（2000 年生），ENFP + 双鱼。985 软工科班，做过抖音、大疆、现在小红书。但比这些更准的描述是：我是一个想用作品本身证明 AI native 的产品经理 —— 我不写 PPT 汇报，我直接 vibecode 给你看。\n\n我喜欢 HUNTER × HUNTER 的奇伢、巴萨的内马尔、王者荣耀的蚩尤，以及一只叫嘻嘻的猫。'
+    },
+    {
+      kw: ['ai native', 'AI native', '为什么是', 'pm', '产品经理'],
+      r: '因为 AI 时代的 PM 不能再只是「写需求、画流程图、跟设计跟开发」。我现在的工作里，汇报基本都是 vibecoding 出来的 —— 不是描述方案，是把方案做出来给你看。\n\nAgent 也是同样的逻辑：我亲手设计 agent soul / KB / skill，纯手搓无开发依赖。这是判断力没在多次交接里被稀释的状态。'
+    },
+    {
+      kw: ['产品', '重要', '判断', '什么最重要'],
+      r: '先别急着做功能，先确认方向有没有站住。\n\n新产品 80% 的能量应该聚焦在「我们在帮谁？解决什么问题？为什么是我们有资格解决？长期价值能否兑现？」剩下 20% 才是基础体验不要出错。\n\n老产品反过来 —— 80% 回到日常体验，20% 才做方向延伸。最怕的就是用新方向掩盖体验退化。'
+    },
+    {
+      kw: ['管理', '讨厌', '团队', '领导'],
+      r: '我讨厌管理和定式。AI 时代没有所谓「经验」、没有所谓「正确的行为或决策」——今天觉得好的，明天就可能变了。\n\n所以我更认同的是：大家经过讨论，选择了一条路走下去。最重要的不是当下这个结果，而是身边的这群人。这才是 AI 时代最重要的。\n\n管理也是如此 —— AI 是团队的第 N+1 个成员，信任不是预设的，是积累的。'
+    },
+    {
+      kw: ['值得做', '什么产品', 'enrich', 'kill time'],
+      r: '产品和时间有三种关系：\n· Kill time —— 消耗注意力（信息流）\n· Save time —— 提高效率（自动化报表）\n· Enrich time —— 让同样的时间获得更深理解、更好体验、更丰富感受\n\n我只想建造第三种。一个让用户更理解自己消费、健康、关系或创作的产品，才在 Enrich time。前两种我没兴趣。'
+    },
+    {
+      kw: ['原则', 'ai 产品', '设计原则'],
+      r: '我有 6 条 AI 产品的设计原则：\n\nAnti-Echo Architecture —— 不让模型无条件迎合用户\nPlurality by Default —— 重要问题默认给多视角\nScaffolding for Thought —— 帮用户更好地想，不替用户想完\nUser Judgement First —— 判断权留给用户\nReality Anchoring —— 组织真实，不替代真实\nExpand Agency, Not Dependency —— 让用户更独立，不更依赖\n\n这 6 条决定了：我做的产品永远不会是「让你舍不得离开」的那种。'
+    },
+    {
+      kw: ['品味', 'taste'],
+      r: '品味不是个人偏好，是一种判断纪律。它通过不断说 no 来保护产品完整性。\n\n要警惕：只因能做就做、为了短期指标破坏长期气质、表面精致但底层结构混乱。\n\n首页不是因为每个团队都有诉求就都给入口；AI 产品不是因为模型能生成很多内容就都展示出来。'
+    },
+    {
+      kw: ['速度', '快', '慢'],
+      r: '速度不是目的，速度的价值是让你有能力慢下来。\n\nAI 释放出来的时间不应该被立刻填满。最好的产品洞察常来自完整的、看似低效的时间：观察用户、走进真实生活、阅读、发呆、体验世界。\n\n产品是建造者内在状态的投射。没有真实生活体验的人，很难做出有栖居感的产品。'
+    },
+    {
+      kw: ['vibecoding', 'vibecode', '建造'],
+      r: '我做的所有汇报基本都是 vibecoding 出来的。这个网站本身就是。\n\nAI 时代的产品设计者不能只停在讨论、评审、转述和交接里。做判断的人要尽可能接近真实建造过程 —— 判断力会在多次交接里被稀释。\n\n自查问题：过去一个月，多少会议可以变成一条结构化异步消息？多少讨论可以变成一个可运行原型？'
+    },
+    {
+      kw: ['弱点', '缺点', '短板'],
+      r: '诚实地说几个：\n\n1. 我对没有清晰场景的「通用产品」感到本能厌恶 —— 这让我有时候错过一些「水龙头型」机会\n2. 我会因为同事缺乏建造能力而焦虑 —— 在偏传统组织里这是双刃剑\n3. 我对纯管理岗位没有传统意义上的渴望 —— 我对「经验复用」和「层级」都比较警惕\n4. 我有时偏感性 —— ENFP+双鱼，偶尔会因为「vibe」而绕过更严谨的论证\n\n这些是我之所以做我自己的代价。我不会为了好看遮掩。'
+    }
+  ];
+
+  const FALLBACK = '嗯，这个问题我现在的 demo 大脑没法准确回答（关键词没匹中）。\n\n等部署到 Vercel 接上真 LLM（Anthropic Claude），我就能展开聊了。\n\n你可以换个角度问，或者点右边的弹幕，那些都是我能 cover 的话题。';
+
+  const msgArea = document.getElementById('msgArea');
+  const userInput = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const modeToggle = document.getElementById('modeToggle');
+  const keyModal = document.getElementById('keyModal');
+  const hdrBackend = document.getElementById('hdrBackend');
+
+  // open msg
+  addMsg('嗨，我是 ronin 的灵魂副本。\n\n你可以问我做产品、聊 AI、聊我喜欢的爱好、或者直接问「你是个什么样的人」。也可以点右边的弹幕墙，那都是我的观点。', 'agent');
+
+  function addMsg(text, from) {
+    const m = document.createElement('div');
+    m.className = 'msg from-' + from;
+    m.textContent = text;
+    msgArea.appendChild(m);
+    msgArea.scrollTop = msgArea.scrollHeight;
+    return m;
+  }
+  function addThinking() {
+    const m = document.createElement('div');
+    m.className = 'msg thinking';
+    m.textContent = '…';
+    msgArea.appendChild(m);
+    msgArea.scrollTop = msgArea.scrollHeight;
+    return m;
+  }
+
+  function localResponse(text) {
+    const lower = text.toLowerCase();
+    for (const r of RESPONSES) {
+      if (r.kw.some(k => text.includes(k) || lower.includes(k.toLowerCase()))) {
+        return r.r;
+      }
+    }
+    return FALLBACK;
+  }
+
+  // Live API status — auto-detected on first send
+  let LIVE_STATUS = 'unknown'; // 'unknown' | 'live' | 'demo'
+
+  async function liveResponse(text) {
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
+    });
+    if (!resp.ok) throw new Error('api ' + resp.status);
+    const data = await resp.json();
+    if (!data.reply) throw new Error('empty reply');
+    return data.reply;
+  }
+
+  async function sendMessage(text) {
+    if (!text || !text.trim()) return;
+    addMsg(text, 'user');
+    userInput.value = '';
+    sendBtn.disabled = true;
+    const thinking = addThinking();
+
+    let reply;
+    if (LIVE_STATUS === 'demo') {
+      // already known to be demo — skip API attempt, simulate thinking
+      await new Promise(r => setTimeout(r, 600 + Math.random() * 600));
+      reply = localResponse(text);
+    } else {
+      // try live (either confirmed 'live' or 'unknown' first attempt)
+      try {
+        reply = await liveResponse(text);
+        if (LIVE_STATUS !== 'live') {
+          LIVE_STATUS = 'live';
+          updateMode();
+        }
+      } catch (e) {
+        if (LIVE_STATUS === 'unknown') {
+          // first failure: switch permanently to demo for this session
+          LIVE_STATUS = 'demo';
+          updateMode();
+        }
+        await new Promise(r => setTimeout(r, 400));
+        reply = localResponse(text);
+      }
+    }
+
+    thinking.remove();
+    addMsg(reply, 'agent');
+    sendBtn.disabled = false;
+    userInput.focus();
+  }
+
+  sendBtn.addEventListener('click', () => sendMessage(userInput.value));
+  userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(userInput.value); });
+  document.querySelectorAll('.sq').forEach(b => {
+    b.addEventListener('click', () => sendMessage(b.dataset.q));
+  });
+
+  // Auto-update mode indicator based on detected status
+  function updateMode() {
+    if (LIVE_STATUS === 'live') {
+      modeToggle.textContent = '● LIVE · CLAUDE';
+      modeToggle.classList.add('real');
+      modeToggle.style.cursor = 'default';
+      modeToggle.title = '已接入 Anthropic Claude · server-managed API key';
+      hdrBackend.textContent = 'CLAUDE SONNET 4.5';
+    } else if (LIVE_STATUS === 'demo') {
+      modeToggle.textContent = 'DEMO MODE';
+      modeToggle.classList.remove('real');
+      modeToggle.style.cursor = 'default';
+      modeToggle.title = '本地模式 / 未部署 —— 用关键词匹配，部署到 Vercel 后会自动切到 LIVE';
+      hdrBackend.textContent = 'DEMO MODE';
+    } else {
+      modeToggle.textContent = 'DETECTING…';
+      modeToggle.classList.remove('real');
+      hdrBackend.textContent = 'DETECTING…';
+    }
+  }
+  updateMode();
+
+  // Keep key modal accessible (legacy) but no longer the primary path
+  modeToggle.addEventListener('click', () => {
+    if (LIVE_STATUS === 'live') return; // already live, nothing to do
+    keyModal.classList.add('show');
+    document.getElementById('apiKeyInput').focus();
+  });
+  document.getElementById('saveKey').addEventListener('click', () => {
+    keyModal.classList.remove('show');
+    addMsg('部署到 Vercel 时把 ANTHROPIC_API_KEY 配在环境变量里，刷新页面后这里会自动切到 LIVE。本地浏览器直接调 anthropic.com 受 CORS 限制不可行。', 'agent');
+  });
+  document.getElementById('cancelKey').addEventListener('click', () => keyModal.classList.remove('show'));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      // 1st: if modal open, close it
+      if (keyModal.classList.contains('show')) { keyModal.classList.remove('show'); return; }
+      // 2nd: if input focused, blur (don't navigate yet)
+      if (document.activeElement === userInput) { userInput.blur(); return; }
+      // 3rd: navigate home
+      window.location.href = 'index.html';
+    }
+  });
+</script>
+</body>
+</html>

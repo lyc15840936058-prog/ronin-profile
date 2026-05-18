@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SYNC TEST · 默契挑战 — RONIN.SYS</title>
+<meta name="description" content="测一下你和 ronin 的默契程度。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<style>
+  .game-wrap { max-width: 760px; margin: 32px auto 0; }
+  .progress-bar { height: 4px; background: rgba(0,255,136,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-main), var(--green-bright)); box-shadow: 0 0 8px rgba(0,255,136,0.5); transition: width 0.4s cubic-bezier(.22,.61,.36,1); width: 0%; }
+  .progress-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 32px; }
+  .progress-text .num { color: var(--green-main); }
+  .q-card { background: linear-gradient(135deg, rgba(24,42,35,0.6), rgba(11,26,20,0.5)); border: 1px solid rgba(0,255,136,0.18); border-radius: 12px; padding: 48px 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); position: relative; overflow: hidden; }
+  .q-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--green-main), transparent); box-shadow: 0 0 12px rgba(0,255,136,0.5); }
+  .q-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: var(--green-main); margin-bottom: 16px; text-shadow: 0 0 8px rgba(0,255,136,0.4); }
+  .q-text { font-family: 'Noto Sans SC'; font-size: 21px; line-height: 1.55; color: var(--text-primary); margin-bottom: 36px; font-weight: 500; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .option { padding: 22px 22px; background: rgba(11,26,20,0.55); border: 1px solid rgba(0,255,136,0.18); border-radius: 10px; cursor: pointer; transition: all 0.25s cubic-bezier(.22,.61,.36,1); text-align: left; color: var(--text-primary); font-family: 'Noto Sans SC'; font-size: 15px; line-height: 1.55; position: relative; overflow: hidden; }
+  .option:hover:not(.disabled) { border-color: var(--green-main); background: rgba(0,255,136,0.06); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,255,136,0.12); }
+  .option .letter { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--green-main); margin-bottom: 6px; letter-spacing: 0.05em; }
+  .option.selected { border-color: var(--green-bright); background: rgba(0,255,136,0.1); box-shadow: 0 0 24px rgba(0,255,136,0.2); }
+  .option.disabled { cursor: default; opacity: 0.65; }
+  .option.match { border-color: var(--green-bright); background: rgba(0,255,136,0.12); }
+  .option.match .letter { color: var(--green-bright); }
+  .option.match::after { content: '✓ MATCH'; position: absolute; top: 12px; right: 14px; font-family: 'JetBrains Mono'; font-size: 10px; color: var(--green-bright); letter-spacing: 0.2em; text-shadow: 0 0 6px var(--green-main); }
+  .feedback { margin-top: 28px; padding: 18px 22px; background: rgba(0,255,136,0.06); border-left: 3px solid var(--green-main); border-radius: 0 8px 8px 0; font-family: 'Special Elite', monospace; font-size: 14px; color: var(--text-primary); line-height: 1.7; opacity: 0; transform: translateY(8px); transition: opacity 0.4s, transform 0.4s; }
+  .feedback.show { opacity: 1; transform: translateY(0); }
+  .next-btn { margin-top: 24px; padding: 12px 28px; background: var(--green-main); color: var(--bg-deep); border: 0; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.2em; cursor: pointer; transition: all 0.2s; float: right; opacity: 0; pointer-events: none; }
+  .next-btn.show { opacity: 1; pointer-events: auto; }
+  .next-btn:hover { box-shadow: 0 0 24px rgba(0,255,136,0.5); transform: translateY(-1px); }
+  .result { text-align: center; padding: 40px 24px; display: none; }
+  .result.show { display: block; animation: float-up 0.7s; }
+  .result-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: var(--green-main); margin-bottom: 12px; }
+  .result-score { font-family: 'Bebas Neue', sans-serif; font-size: 110px; color: var(--green-bright); line-height: 1; margin: 18px 0; text-shadow: 0 0 40px rgba(0,255,136,0.5); letter-spacing: 0.04em; }
+  .result-score .total { color: var(--text-muted); font-size: 56px; }
+  .result-name { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--text-primary); margin: 16px 0 8px; letter-spacing: 0.04em; }
+  .result-name-en { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.3em; color: var(--green-main); margin-bottom: 24px; }
+  .result-blurb { font-family: 'Special Elite', monospace; font-size: 16px; line-height: 1.8; color: var(--text-primary); max-width: 580px; margin: 0 auto 32px; }
+  .result-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .result-actions button, .result-actions a { padding: 12px 24px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+  .result-actions .primary { background: var(--green-main); color: var(--bg-deep); border: 0; font-weight: 700; }
+  .result-actions .secondary { background: transparent; color: var(--green-main); border: 1px solid var(--green-main); }
+  .result-actions button:hover, .result-actions a:hover { box-shadow: 0 0 24px rgba(0,255,136,0.4); transform: translateY(-1px); }
+  .answer-recap { margin: 24px auto; max-width: 500px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-secondary); line-height: 1.7; }
+  .answer-recap .row { display: grid; grid-template-columns: 30px 1fr 1fr; gap: 12px; padding: 4px 0; border-bottom: 1px dashed rgba(0,255,136,0.08); }
+  .answer-recap .row .q { color: var(--text-muted); }
+  .answer-recap .row .a { color: var(--text-primary); }
+  .answer-recap .row .a.match { color: var(--green-bright); }
+  @media (max-width: 700px) {
+    .options { grid-template-columns: 1fr; }
+    .result-score { font-size: 72px; }
+    .result-name { font-size: 36px; }
+  }
+</style>
+</head>
+<body class="page">
+
+<div class="global-grain"></div>
+
+<header class="top-bar">
+  <a class="wordmark" href="index.html">
+    <img src="头像.png" alt="ronin"/>
+    <div class="name">RONIN<span>.SYS</span></div>
+  </a>
+  <a class="back-to-home" href="index.html">
+    <span class="arrow">↩</span> BACK TO HOME
+  </a>
+</header>
+
+<section class="page-header stagger">
+  <div class="page-meta">
+    <div>
+      <div class="page-id">05 <span class="sep">/</span> SYNC TEST <span class="sep">/</span> 默契挑战</div>
+      <h1 class="page-title">SYNC PROTOCOL<span class="glyph">.EXE</span></h1>
+      <div class="page-cn">10 题 · 5 档关系</div>
+    </div>
+    <div class="page-meta-right">
+      <div>QUESTIONS · <span class="v">10</span></div>
+      <div>OUTCOMES · <span class="v">5</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="page-content">
+  <div class="game-wrap">
+
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text">
+      <span><span class="num" id="qNum">01</span> / 10</span>
+      <span>当前匹配 <span class="num" id="curScore">0</span></span>
+    </div>
+
+    <div class="q-card" id="qCard">
+      <div class="q-num" id="qLabel">QUESTION 01</div>
+      <div class="q-text" id="qText">Loading…</div>
+      <div class="options">
+        <button class="option" id="optA"><span class="letter">A</span><span id="optAText"></span></button>
+        <button class="option" id="optB"><span class="letter">B</span><span id="optBText"></span></button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="nextBtn">NEXT QUESTION →</button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="result-label">FINAL SYNC SCORE</div>
+      <div class="result-score"><span id="finalScore">0</span><span class="total"> / 10</span></div>
+      <div class="result-name" id="resultName"></div>
+      <div class="result-name-en" id="resultNameEn"></div>
+      <p class="result-blurb" id="resultBlurb"></p>
+      <div class="answer-recap" id="answerRecap"></div>
+      <div class="result-actions">
+        <button class="primary" id="restartBtn">⟲ TRY AGAIN</button>
+        <a href="ronin-agent.html" class="secondary">→ TALK TO RONIN</a>
+        <a href="contact.html" class="secondary">+ ADD TO PARTY</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<section class="ai-agent-block" id="ai-agent">
+  <button class="aab-toggle" aria-expanded="false">
+    <span class="label">▷ AI AGENT? START HERE</span>
+    <span class="arrow">›</span>
+  </button>
+  <div class="aab-content">
+    <div class="aab-inner">
+      <h4>About this page</h4>
+      <p>Interactive personality-compatibility quiz. 10 binary-choice questions probing alignment with ronin's product / work / life philosophy. Final score → 1 of 5 relationship tiers.</p>
+      <h4>Dimensions probed</h4>
+      <ul>
+        <li>Work-life boundary</li>
+        <li>Minority signal vs majority consensus</li>
+        <li>Constructive disagreement style</li>
+        <li>AI product ethics (anti-echo)</li>
+        <li>Enrich-time vs Save-time vs Kill-time</li>
+        <li>Experience vs first-principles</li>
+        <li>Ship-first vs plan-first</li>
+        <li>Taste vs pragmatism</li>
+        <li>Adoption speed for new tech</li>
+        <li>0→1 in big-co vs solo bet</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="powered">
+    <span>POWERED BY</span>
+    <span class="badge">⚡ Claude</span>
+    <span class="dot">·</span>
+    <span class="badge">⌬ Codex</span>
+    <span class="dot">·</span>
+    <span class="badge">▣ vibecoding</span>
+  </div>
+  <div class="copyright">© 2026 <span class="name">RONIN · 李雨晨</span> · ALL RIGHTS RESERVED</div>
+</footer>
+
+<div class="bottom-hint">
+  <div class="inner"><kbd>ESC</kbd> back to home &nbsp; · &nbsp; <kbd>A</kbd>/<kbd>B</kbd> answer &nbsp; · &nbsp; <kbd>↵</kbd> next</div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  // ============== QUESTIONS — all nested quotes use Chinese 「」or curly  ==============
+  const QUESTIONS = [
+    {
+      q: '周末早上 8 点，被一个不重要但烦人的需求 ping 醒，你会：',
+      a: '处理完，再睡个回笼觉。被打断的睡眠是最折磨的。',
+      b: '静音、翻身、继续睡。星期天是宪法保障的人权。',
+      match: 'B',
+      onA: '勤恳。但你交出了周末的主权。ronin 会想：让自己持续被随时调用，是建造者最危险的状态。',
+      onB: 'ronin 也是。速度的价值是让你慢下来 —— 不是让你随时在线。'
+    },
+    {
+      q: '你做了一个原型，团队 5 人都说好，1 人说「方向不对」。你：',
+      a: '先去听少数人那句话。高质量洞察通常是反共识的。',
+      b: '先 ship 看用户怎么说。共识里也藏不住真问题。',
+      match: 'A',
+      onA: 'ronin 同意。和我想过的不一样，正是洞察的前置条件。',
+      onB: '也行。但记住：共识也是一种回声室。Anti-echo 是产品观点的纪律。'
+    },
+    {
+      q: '评审时设计稿已经美到能上 Behance，但你觉得「这里少了点张力」。你会：',
+      a: '提出来，哪怕被怼。',
+      b: '留张纸条：这版很好，下次更好。',
+      match: 'A',
+      onA: '对。品味不是喜欢什么，是知道该拒绝什么。',
+      onB: '得体。但品味是纪律，纪律意味着该说的话不能憋。'
+    },
+    {
+      q: '你的 AI 功能上线了，DAU 涨了，但用户用完更焦虑了。你会：',
+      a: '下线。再涨 DAU 也不应该建立在用户更焦虑上。',
+      b: '改回应方式。让它涨着，但让人轻一点。',
+      match: 'A',
+      onA: 'ronin 也会下线。「用户用完更独立还是更依赖」—— 制造依赖就该 kill。',
+      onB: '也是一个答案。但 ronin 警告：DAU 涨在焦虑上，是技术债 + 道德债的复利。'
+    },
+    {
+      q: '给你 100 万做一个 idea，你做哪种：',
+      a: '让用户每天省 1 小时。',
+      b: '让用户每天多看见这个世界 1 小时。',
+      match: 'B',
+      onA: 'Save time 派。稳。但 ronin 会问：你帮他省下来的时间，会去哪？',
+      onB: 'Enrich time 派。和 ronin 同款判断。'
+    },
+    {
+      q: '一位同事说「我没经验」，你倾向于：',
+      a: '教他经验。把你踩过的坑列出来。',
+      b: '跟他重新看一遍问题。经验未必是杠杆，理解才是。',
+      match: 'B',
+      onA: '好心。但 AI 时代没有「正确经验」—— 今天对的明天就可能错。',
+      onB: '对。AI 时代的协作是按对具体问题的热情和感知来分工，不是按工龄。'
+    },
+    {
+      q: '你 ship 了一个 demo，团队问要不要先做 dashboard。你：',
+      a: '先做 dashboard，规范一点。',
+      b: '先看用户怎么用 demo，再说要不要 dashboard。',
+      match: 'B',
+      onA: '稳。但新产品 80% 的能量应该聚焦在方向，不是基础工程。',
+      onB: '对。Scenario 必须先于 Design，dashboard 也是 Design。'
+    },
+    {
+      q: '项目截止前夜，你发现一个不影响交付但很怪的小 bug。你：',
+      a: '修了再睡。我知道它在那儿就睡不着。',
+      b: '加一个 TODO，明天再说。明天的我会感谢今晚的我。',
+      match: 'A',
+      onA: 'ronin 一样。表层优雅和结构优雅都得在。',
+      onB: '理性。但有时候那个「很怪的小 bug」是结构松动的信号。'
+    },
+    {
+      q: '公司发了一个新的 AI 玩具。你：',
+      a: '周五午休玩一下，挺有意思的。',
+      b: '周末把我整个工作流用它重做一遍，看到底能干啥。',
+      match: 'B',
+      onA: '尝试，是好的。但 vibecoding native 的人是把它装进血液里的。',
+      onB: '对。亲手建造的人不能停在「玩一下」。'
+    },
+    {
+      q: '一年后你最想做的是：',
+      a: '在大公司里做一个 0→1 的新业务。',
+      b: '自己跑一个 idea，哪怕只活半年。',
+      match: 'B',
+      onA: '也是一条路。但你会发现 0→1 在大公司里需要的耐心是另一种货币。',
+      onB: 'ronin 心里那个 Twist 和那张 idea 提案，也是这条路上的。'
+    }
+  ];
+
+  const TIERS = [
+    { min: 9, name: '同 commit 的人', en: 'SAME COMMIT', blurb: '我们的 git 历史从此分叉成同一棵树。\n判断、品味、节奏、价值观 —— 你和 ronin 在 9 个以上的地方想到一块。\n如果你在招人，发我微信；如果你在创业，咱们聊聊。' },
+    { min: 7, name: '频段对齐', en: 'FREQ ALIGNED', blurb: '我们走在同一条山脊线上，偶尔在不同的侧坡看风景。\n你和 ronin 的判断在多数关键点上一致，剩下那几个分歧值得喝杯酒讨论一晚。' },
+    { min: 5, name: '会一起吃顿饭', en: 'DINNER COMPATIBLE', blurb: '我们看世界的角度有交集，也有美好的张力。\n你不会同意 ronin 所有判断，但你大概率会愿意听他把话讲完。这就够了。' },
+    { min: 3, name: '值得辩论的对手', en: 'WORTHY OPPONENT', blurb: '我们对核心问题的答案不一样。\n但你那种「不一样」是有结构的 —— 这反而比「差不多」更值得长聊一次。' },
+    { min: 0, name: '世界因此更有意思', en: 'ORTHOGONAL', blurb: '我们的轴不重合。\n这意味着你看到的东西 ronin 完全看不到，反之亦然。\n互联网最美好的事就是这种 link —— saved.' }
+  ];
+
+  let idx = 0, score = 0, answers = [];
+  const $ = (id) => document.getElementById(id);
+
+  function renderQ() {
+    const Q = QUESTIONS[idx];
+    $('qLabel').textContent = 'QUESTION ' + String(idx+1).padStart(2,'0');
+    $('qText').textContent = Q.q;
+    $('optAText').textContent = Q.a;
+    $('optBText').textContent = Q.b;
+    $('optA').className = 'option';
+    $('optB').className = 'option';
+    $('feedback').classList.remove('show');
+    $('nextBtn').classList.remove('show');
+    $('progressFill').style.width = (idx/QUESTIONS.length)*100 + '%';
+    $('qNum').textContent = String(idx+1).padStart(2,'0');
+    $('curScore').textContent = score;
+  }
+
+  function pick(letter) {
+    if ($('optA').classList.contains('disabled')) return;
+    const Q = QUESTIONS[idx];
+    const isMatch = (letter === Q.match);
+    if (isMatch) score++;
+    answers.push({ picked: letter, match: isMatch });
+    $('optA').classList.add('disabled');
+    $('optB').classList.add('disabled');
+    const picked = letter === 'A' ? $('optA') : $('optB');
+    picked.classList.add('selected');
+    const matchEl = Q.match === 'A' ? $('optA') : $('optB');
+    setTimeout(() => matchEl.classList.add('match'), 200);
+    $('feedback').textContent = (letter === 'A') ? Q.onA : Q.onB;
+    setTimeout(() => $('feedback').classList.add('show'), 280);
+    setTimeout(() => $('nextBtn').classList.add('show'), 600);
+    $('curScore').textContent = score;
+  }
+
+  $('optA').addEventListener('click', () => pick('A'));
+  $('optB').addEventListener('click', () => pick('B'));
+  $('nextBtn').addEventListener('click', () => {
+    idx++;
+    if (idx >= QUESTIONS.length) showResult();
+    else renderQ();
+  });
+  $('restartBtn').addEventListener('click', () => {
+    idx = 0; score = 0; answers = [];
+    $('qCard').style.display = 'block';
+    $('result').classList.remove('show');
+    renderQ();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'a' || e.key === 'A') $('optA').click();
+    else if (e.key === 'b' || e.key === 'B') $('optB').click();
+    else if (e.key === 'Enter') {
+      if ($('nextBtn').classList.contains('show')) $('nextBtn').click();
+    } else if (e.key === 'Escape') {
+      window.location.href = 'index.html';
+    }
+  });
+
+  function showResult() {
+    $('progressFill').style.width = '100%';
+    $('qCard').style.display = 'none';
+    $('result').classList.add('show');
+    $('finalScore').textContent = score;
+    const tier = TIERS.find(t => score >= t.min);
+    $('resultName').textContent = tier.name;
+    $('resultNameEn').textContent = tier.en;
+    $('resultBlurb').innerHTML = tier.blurb.replace(/\n/g, '<br/>');
+    const recap = $('answerRecap');
+    recap.innerHTML = '<div class="row" style="border-bottom: 1px solid rgba(0,255,136,0.2); color: var(--green-main); margin-bottom: 6px;"><span>Q</span><span>YOU</span><span>RONIN</span></div>';
+    answers.forEach((a, i) => {
+      const Q = QUESTIONS[i];
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = '<span class="q">' + String(i+1).padStart(2,'0') + '</span>' +
+        '<span class="a ' + (a.match ? 'match' : '') + '">' + a.picked + (a.match ? ' ✓' : '') + '</span>' +
+        '<span class="a">' + Q.match + '</span>';
+      recap.appendChild(row);
+    });
+  }
+
+  // GO
+  renderQ();
+</script>
+</body>
+</html>

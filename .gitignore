@@ -1,0 +1,62 @@
+# Vercel
+.vercel
+.env*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode
+.idea
+*.swp
+
+# Dependencies
+node_modules
+
+# Build artifacts
+.next
+dist
+
+# Working / scratch files we don't want in the repo
+mockup-hero-v*.html
+PLAN.md
+PROGRESS.md
+
+# Original source documents that don't need to ship
+*.pptx
+*.pdf
+奇伢介绍*.pdf
+DJI uni 决赛ppt.pptx
+DJI CDP消费者数据标签平台思路.pptx
+李雨晨-工作4年-小红书简历.pdf
+入职小红书前的简历 2.pdf
+Ronin试用期答辩 v2.0.pptx
+
+# Working scratch images (now superseded)
+人物_cutout.png
+人物去背景.png
+人物.png
+背景.png
+首页游戏风格人物图.png
+首页游戏风格参考.png
+loading1.png
+loading2.png
+roadmap布局.jpg
+参考布局1.png
+ai\ agent\ start\ here.png
+非常喜欢的ip角色——奇伢\ 1.gif
+title闪烁赛博动效感觉.mov
+人物呼吸感案例.mov
+游戏待机呼吸感.mov
+录屏*.mov
+
+# misc photos not used
+20260514170423524.png
+关系举例.png
+个人profile.png
+个人照1.jpeg
+个人照2.jpg
+奇伢介绍2.png
+idea提案.png

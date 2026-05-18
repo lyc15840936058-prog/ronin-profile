@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QUEST LOG · 通关记录 — RONIN.SYS</title>
+<meta name="description" content="ronin / 李雨晨 的工作经历副本：字节抖音、DJI 大疆 IBG、小红书 企业智能部。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<style>
+  /* dungeon header card per company */
+  .dungeon {
+    margin: 48px 0;
+    border: 1px solid rgba(0,255,136,0.18);
+    border-radius: 10px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(24,42,35,0.5), rgba(13,26,22,0.4));
+    position: relative;
+  }
+  .dungeon-header {
+    padding: 28px 32px;
+    background: linear-gradient(180deg, rgba(0,255,136,0.05), transparent);
+    border-bottom: 1px solid rgba(0,255,136,0.12);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 20px;
+  }
+  .dungeon-name {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 2rem;
+    transform: skew(-3deg);
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+  .dungeon-name .meta-en {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--green-main);
+    letter-spacing: 0.3em;
+    transform: skew(3deg);
+    margin-bottom: 4px;
+  }
+  .dungeon-summary {
+    font-family: 'Special Elite', monospace;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-top: 12px;
+    max-width: 700px;
+  }
+  .dungeon-stat {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    line-height: 1.7;
+  }
+  .dungeon-stat .label { color: var(--text-muted); }
+  .dungeon-stat .v { color: var(--green-main); }
+  .dungeon-stat .diff { color: var(--accent-warn); margin-top: 6px; font-size: 11px; }
+
+  .dungeon-body {
+    padding: 28px 32px;
+  }
+
+  .quest-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .quest {
+    background: rgba(13, 26, 22, 0.55);
+    border: 1px solid rgba(0,255,136,0.12);
+    border-radius: 6px;
+    padding: 18px 20px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .quest:hover {
+    border-color: var(--green-main);
+    box-shadow: 0 8px 30px rgba(0,255,136,0.12);
+    transform: translateY(-2px);
+  }
+  .quest::before {
+    content: 'QUEST';
+    position: absolute;
+    top: 12px; right: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--text-muted);
+  }
+  .quest .q-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--green-main);
+    background: rgba(0,255,136,0.1);
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+  .quest .q-title {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 18px;
+    color: var(--text-primary);
+    transform: skew(-3deg);
+    letter-spacing: 0.02em;
+    margin: 4px 0 8px;
+    line-height: 1.2;
+    display: inline-block;
+  }
+  .quest .q-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    margin-bottom: 10px;
+  }
+  .quest .q-desc {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .quest .q-img {
+    margin: 10px 0;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(0,255,136,0.1);
+    max-height: 160px;
+    display: flex;
+    background: var(--bg-mid);
+  }
+  .quest .q-img img { width: 100%; height: 160px; object-fit: cover; }
+  .quest .q-metrics { margin-top: 10px; }
+
+  /* feature row — high-priority projects span full width */
+  .quest.feature { grid-column: span 2; }
+  .quest.feature .q-title { font-size: 22px; }
+
+  /* trophy callout — high-impact quote */
+  .trophy {
+    margin: 16px 0;
+    padding: 16px 22px;
+    background: linear-gradient(90deg, rgba(255,217,61,0.1), transparent);
+    border-left: 3px solid var(--accent-warn);
+    border-radius: 0 6px 6px 0;
+  }
+  .trophy .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--accent-warn);
+    margin-bottom: 6px;
+  }
+  .trophy .quote {
+    font-family: 'Special Elite', monospace;
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* BOSS card — end-of-dungeon takeaways */
+  .boss {
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255,61,94,0.06), rgba(255,217,61,0.04));
+    border: 1px dashed var(--accent-warn);
+    border-radius: 8px;
+  }
+  .boss-h {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 16px;
+    color: var(--accent-warn);
+    transform: skew(-3deg);
+    margin-bottom: 8px;
+    display: inline-block;
+  }
+  .boss-text {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.7;
+  }
+
+  /* honors gallery */
+  .honors {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .honors img { width: 100%; aspect-ratio: 1.4; object-fit: cover; border-radius: 6px; border: 1px solid rgba(0,255,136,0.15); }
+
+  @media (max-width: 800px) {
+    .quest-grid { grid-template-columns: 1fr; }
+    .quest.feature { grid-column: span 1; }
+    .dungeon-header { grid-template-columns: 1fr; }
+    .dungeon-stat { text-align: left; }
+  }
+</style>
+</head>
+<body class="page">
+
+<div class="global-grain"></div>
+
+<header class="top-bar">
+  <a class="wordmark" href="index.html">
+    <img src="头像.png" alt="ronin"/>
+    <div class="name">RONIN<span>.SYS</span></div>
+  </a>
+  <a class="back-to-home" href="index.html">
+    <span class="arrow">↩</span> BACK TO HOME
+  </a>
+</header>
+
+<section class="page-header stagger">
+  <div class="page-meta">
+    <div>
+      <div class="page-id">02 <span class="sep">/</span> QUEST LOG <span class="sep">/</span> 通关记录</div>
+      <h1 class="page-title">WORK LOG<span class="glyph">.HIST</span></h1>
+      <div class="page-cn">4 年 · 3 家公司 · 12+ 项目</div>
+    </div>
+    <div class="page-meta-right">
+      <div>YEARS · <span class="v">4</span></div>
+      <div>HONORS · <span class="v">IBG 产品之星</span></div>
+      <div>REVIEWS · <span class="v">1S + 9A</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="page-content">
+
+  <!-- ====== DUNGEON 1 · 字节 ====== -->
+  <section class="dungeon stagger">
+    <div class="dungeon-header">
+      <div>
+        <div class="dungeon-name"><span class="meta-en">DUNGEON 01 · ByteDance · Douyin Architecture</span>字节跳动 · 抖音主架构</div>
+        <div class="dungeon-summary">PM 实习生 · 2021.05 · 参与抖音第一代本地生活板块的从 0 到 1。第一次在巨型架构里学会"找信号"。</div>
+      </div>
+      <div class="dungeon-stat">
+        <div class="label">★ DIFFICULTY</div>
+        <div class="v">★★</div>
+        <div class="label" style="margin-top: 8px;">DURATION</div>
+        <div class="v">2021.05 — 2021.09</div>
+      </div>
+    </div>
+    <div class="dungeon-body">
+      <div class="quest-grid">
+        <div class="quest feature">
+          <span class="q-tag">FOUNDING SCOPE</span>
+          <div class="q-title">抖音本地生活 · 0→1</div>
+          <div class="q-role">PRODUCT INTERN · MAIN ARCHITECTURE</div>
+          <div class="q-desc">参与抖音第一代本地生活板块的早期方向探索与原型落地。第一次理解什么叫"巨型产品里的小信号"，第一次学会在不确定中拍板。</div>
+        </div>
+      </div>
+      <div class="boss">
+        <span class="boss-h">★ BOSS NOTE</span>
+        <div class="boss-text">在亿级日活的产品里，**判断"哪个信号值得追"比写需求文档重要 100 倍**。学会读数据、读用户、读公司的耐心。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== DUNGEON 2 · DJI ====== -->
+  <section class="dungeon stagger">
+    <div class="dungeon-header">
+      <div>
+        <div class="dungeon-name"><span class="meta-en">DUNGEON 02 · DJI · IBG · BIG MAP</span>DJI 大疆 · IBG 互联网事业部</div>
+        <div class="dungeon-summary">全栈产品经理 · 2022.06 — 2025.05 · 3 年。同时担任 Product Owner 与 Project Manager；To C / To B / To E 三栖；从消费者中台、扫地机器人到 PRM、智慧楼宇。</div>
+      </div>
+      <div class="dungeon-stat">
+        <div class="label">★ DIFFICULTY</div>
+        <div class="v">★★★★</div>
+        <div class="label" style="margin-top: 8px;">DURATION</div>
+        <div class="v">2022.06 — 2025.05</div>
+        <div class="diff">★ IBG 产品之星 · 1S + 9A</div>
+      </div>
+    </div>
+    <div class="dungeon-body">
+
+      <div class="quest-grid">
+
+        <!-- 扫地机器人 -->
+        <div class="quest feature">
+          <span class="q-tag">TO C · HARDWARE</span>
+          <div class="q-title">CR810 扫地机器人 · 0→1</div>
+          <div class="q-role">SOFTWARE PRODUCT OWNER</div>
+          <div class="q-img">
+            <img src="扫地机器人1.png" alt="CR810" />
+          </div>
+          <div class="q-desc">独立负责操控 APP 的从 0 到 1，并从软件侧反推硬件机会点。通过竞品 workshop、用户画像，重新找寻扫地机器人的核心竞争力，定义里程碑与亮点功能。已上市。</div>
+          <div class="q-metrics">
+            <span class="metric"><span class="big">0→1</span>从无到上市</span>
+            <span class="metric">软件侧 → 硬件机会点反向输出</span>
+          </div>
+        </div>
+
+        <!-- CDP / 用户中台 -->
+        <div class="quest feature">
+          <span class="q-tag">TO C · DATA PLATFORM</span>
+          <div class="q-title">DJI 消费者中台 (CDP)</div>
+          <div class="q-role">PRODUCT OWNER · 用户中台</div>
+          <div class="q-desc">搭建 DJI 首套消费者标签体系 & 画像模型：整合软硬件数据、抽象各业务线需求、设计标签规则、开发托拉拽 CDP 平台；将用户旅程与 AIPL/RFM 融合，定义各生命周期画像。</div>
+          <div class="q-metrics">
+            <span class="metric">新品转化率 <span class="big">0.023% → 0.162%</span></span>
+            <span class="metric">个推 ROI <span class="big">14 → 75</span></span>
+          </div>
+          <div class="placeholder" style="margin-top: 10px; min-height: 90px;">
+            <div>DJI CDP 架构图占位</div>
+            <div class="desc">等 ronin 给：从 DJI CDP消费者数据标签平台思路.pptx 抽 1 张关键架构图</div>
+          </div>
+        </div>
+
+        <!-- 获客增长 -->
+        <div class="quest">
+          <span class="q-tag">TO C · GROWTH</span>
+          <div class="q-title">DJI 获客增长</div>
+          <div class="q-role">PROJECT MANAGER</div>
+          <div class="q-desc">封装快捷登录 SDK（谷歌/微信/运营商一键），全业务线接入；深挖各国订阅法规，加场景化引导组件。</div>
+          <div class="q-metrics">
+            <span class="metric">登录注册成功率 <span class="big">90.1% → 98.6%</span></span>
+            <span class="metric">订阅率 <span class="big">31.5% → 74.0%</span></span>
+          </div>
+        </div>
+
+        <!-- NSS 体验管理 -->
+        <div class="quest">
+          <span class="q-tag">TO C · CX MANAGEMENT</span>
+          <div class="q-title">DJI 体验管理 (NSS)</div>
+          <div class="q-role">PRODUCT OWNER</div>
+          <div class="q-desc">DJI 首个 To C 满意度收集 & 管理工具。抽象多业务线 NSS 需求，封装 APP/web/server 三端组件，跨部门推动接入。</div>
+          <div class="q-metrics">
+            <span class="metric"><span class="big">首个</span>跨三端 NSS 组件</span>
+            <span class="metric"><span class="big">7</span>业务线接入</span>
+          </div>
+        </div>
+
+        <!-- PRM APP -->
+        <div class="quest">
+          <span class="q-tag">TO B · DEALER APP</span>
+          <div class="q-title">PRM APP · 全品牌代理商系统</div>
+          <div class="q-role">PRODUCT OWNER · 代理商 PRM</div>
+          <div class="q-desc">从 0 到 1 设计并搭建 DJI 全品牌代理商 APP；将每个功能/资源设计为独立组件，按身份权限分组件开放；收集抽象不同品牌不同国家代理商需求。</div>
+          <div class="q-metrics">
+            <span class="metric"><span class="big">10d</span>新品牌接入并上线</span>
+            <span class="metric"><span class="big">7</span>独立品牌</span>
+          </div>
+        </div>
+
+        <!-- 拓店巡店 -->
+        <div class="quest">
+          <span class="q-tag">TO B · FIELD OPS</span>
+          <div class="q-title">DJI 拓店巡店</div>
+          <div class="q-role">PRODUCT OWNER</div>
+          <div class="q-desc">巡店 APP 嵌入谷歌/高德地图，标记门店位置与状态；抽象各品牌任务表单，拉通 PRM 数据，新国家快速上线。</div>
+          <div class="q-metrics">
+            <span class="metric">销管提效 <span class="big">9 人天/月</span></span>
+          </div>
+        </div>
+
+        <!-- 天空之城 OA -->
+        <div class="quest">
+          <span class="q-tag">TO E · SMART OFFICE</span>
+          <div class="q-title">天空之城 · AI 智慧楼宇</div>
+          <div class="q-role">PRODUCT & PROJECT MANAGER</div>
+          <div class="q-desc">在 DJI 新总部"天空之城"，完成 OA / 行政系统的智能化 AI 改造：智能呼梯、会议室、访客、手势消费、AI 亮点功能；并打造服务号持续运营反馈。</div>
+          <div class="q-metrics">
+            <span class="metric"><span class="big">全面升级</span>员工入职后办公体验</span>
+          </div>
+        </div>
+
+        <!-- 管理闭环 -->
+        <div class="quest">
+          <span class="q-tag">TO E · MANAGEMENT</span>
+          <div class="q-title">DJI 管理闭环</div>
+          <div class="q-role">PRODUCT OWNER</div>
+          <div class="q-desc">多场景待办闭环：公司级管理看板（一眼看全 + 下钻 + 一键催办）、部门级 IM 群待办 / 会议待办、中台组件支撑绩效/云文档/审批流接入。</div>
+          <div class="q-metrics">
+            <span class="metric">管理者安全感 / 掌控感 ↑</span>
+            <span class="metric">专题项目推进效率 ↑</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- DJI uni — special highlight with full gallery -->
+      <h3 class="section-h" style="margin-top: 32px;"><span class="num">★</span> SPECIAL EVENT <span class="cn">/ 公司内部黑客马拉松</span></h3>
+      <div class="quest feature" style="margin-top: 0; border-color: rgba(255,217,61,0.4);">
+        <span class="q-tag" style="background: rgba(255,217,61,0.15); color: var(--accent-warn);">HACKATHON · TOP 2</span>
+        <div class="q-title">DJI uni · 全息 AI 助理</div>
+        <div class="q-role">CREATIVE LEAD · 内部创业比赛</div>
+        <div class="q-desc">DJI 内部创业比赛作品。一款 AI × 光 × 声音 × 空间 的全息助理。从 idea 到产品规划到实物原型，端到端独立完成。获 <strong style="color: var(--accent-warn)">全场第二 + 最佳创意奖</strong>。</div>
+        <div class="q-metrics">
+          <span class="metric"><span class="big">2nd</span>全场</span>
+          <span class="metric"><span class="big">★</span>最佳创意奖</span>
+        </div>
+
+        <!-- DJI uni stacked gallery — like photo wall, click to zoom for full readable size -->
+        <div style="position: relative; height: 320px; margin-top: 16px;">
+          <!-- product UI screenshot — landscape, mid-left -->
+          <div class="zoomable pw-stack" data-src="dji-uni-product.png" style="position: absolute; top: 20px; left: 2%; width: 280px; height: 175px; transform: rotate(-4deg); z-index: 4; border-radius: 8px; overflow: hidden; cursor: zoom-in; box-shadow: 0 10px 28px rgba(0,0,0,0.5); border: 1px solid rgba(0,255,136,0.18); background: var(--bg-mid);">
+            <img src="dji-uni-product.png" style="width:100%; height:100%; object-fit:cover; object-position:top center; display:block;" alt="DJI uni 产品方案"/>
+            <span style="position:absolute; top:6px; left:8px; font-family:'JetBrains Mono'; font-size:8px; letter-spacing:0.18em; color:var(--green-main); background:rgba(11,26,20,0.85); padding:2px 6px; border-radius:3px;">PRODUCT</span>
+          </div>
+          <!-- capability UI -->
+          <div class="zoomable pw-stack" data-src="dji-uni-capability.png" style="position: absolute; top: 50px; left: 22%; width: 280px; height: 175px; transform: rotate(3deg); z-index: 5; border-radius: 8px; overflow: hidden; cursor: zoom-in; box-shadow: 0 10px 28px rgba(0,0,0,0.5); border: 1px solid rgba(0,255,136,0.18); background: var(--bg-mid);">
+            <img src="dji-uni-capability.png" style="width:100%; height:100%; object-fit:cover; object-position:top center; display:block;" alt="DJI uni 能力解构"/>
+            <span style="position:absolute; top:6px; left:8px; font-family:'JetBrains Mono'; font-size:8px; letter-spacing:0.18em; color:var(--green-main); background:rgba(11,26,20,0.85); padding:2px 6px; border-radius:3px;">CAPABILITY</span>
+          </div>
+          <!-- welcome UI -->
+          <div class="zoomable pw-stack" data-src="DJI uni 4.png" style="position: absolute; top: 30px; left: 42%; width: 280px; height: 175px; transform: rotate(-2deg); z-index: 6; border-radius: 8px; overflow: hidden; cursor: zoom-in; box-shadow: 0 10px 28px rgba(0,0,0,0.5); border: 1px solid rgba(0,255,136,0.18); background: var(--bg-mid);">
+            <img src="DJI uni 4.png" style="width:100%; height:100%; object-fit:cover; object-position:top center; display:block;" alt="DJI uni 欢迎页"/>
+            <span style="position:absolute; top:6px; left:8px; font-family:'JetBrains Mono'; font-size:8px; letter-spacing:0.18em; color:var(--green-main); background:rgba(11,26,20,0.85); padding:2px 6px; border-radius:3px;">WELCOME</span>
+          </div>
+          <!-- prototype - portrait -->
+          <div class="zoomable pw-stack" data-src="DJI uni 1.jpg" style="position: absolute; top: 70px; right: 18%; width: 160px; height: 220px; transform: rotate(5deg); z-index: 7; border-radius: 8px; overflow: hidden; cursor: zoom-in; box-shadow: 0 10px 28px rgba(0,0,0,0.5); border: 1px solid rgba(0,255,136,0.18); background: var(--bg-mid);">
+            <img src="DJI uni 1.jpg" style="width:100%; height:100%; object-fit:cover; display:block;" alt="DJI uni 纸盒原型"/>
+            <span style="position:absolute; top:6px; left:8px; font-family:'JetBrains Mono'; font-size:8px; letter-spacing:0.18em; color:var(--accent-warn); background:rgba(11,26,20,0.85); padding:2px 6px; border-radius:3px;">PROTOTYPE</span>
+          </div>
+          <!-- live presentation -->
+          <div class="zoomable pw-stack" data-src="DJI uni 2.jpg" style="position: absolute; top: 40px; right: 2%; width: 220px; height: 150px; transform: rotate(-3deg); z-index: 5; border-radius: 8px; overflow: hidden; cursor: zoom-in; box-shadow: 0 10px 28px rgba(0,0,0,0.5); border: 1px solid rgba(0,255,136,0.18); background: var(--bg-mid);">
+            <img src="DJI uni 2.jpg" style="width:100%; height:100%; object-fit:cover; display:block;" alt="DJI uni 现场答辩"/>
+            <span style="position:absolute; top:6px; left:8px; font-family:'JetBrains Mono'; font-size:8px; letter-spacing:0.18em; color:var(--accent-warn); background:rgba(11,26,20,0.85); padding:2px 6px; border-radius:3px;">LIVE</span>
+          </div>
+        </div>
+        <style>
+          .pw-stack { transition: transform 0.4s cubic-bezier(.22,.61,.36,1), box-shadow 0.3s, z-index 0s 0.4s; }
+          .pw-stack:hover { transform: rotate(0deg) scale(1.08) !important; z-index: 200 !important; box-shadow: 0 22px 50px rgba(0,255,136,0.3) !important; border-color: var(--green-main) !important; transition: transform 0.4s cubic-bezier(.22,.61,.36,1), box-shadow 0.3s, z-index 0s 0s; }
+        </style>
+        <div style="margin-top: 12px; font-family:'JetBrains Mono'; font-size: 9px; color: var(--text-muted); letter-spacing: 0.15em;">▷ PRODUCT · CAPABILITY · WELCOME · PROTOTYPE · LIVE · hover 翻正 · 点击放大可读</div>
+      </div>
+
+      <div class="boss">
+        <span class="boss-h">★ BOSS NOTE · DJI 给我的</span>
+        <div class="boss-text">三年里同时做 To C / To B / To E、从硬件操控 APP 到数据中台、从代理商 APP 到智慧楼宇—— **真正学会的不是某个域，而是"在不同领域之间快速建立抽象的能力"**。这是后来做 AI 产品的底子。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== DUNGEON 3 · 小红书 ====== -->
+  <section class="dungeon stagger">
+    <div class="dungeon-header">
+      <div>
+        <div class="dungeon-name"><span class="meta-en">DUNGEON 03 · XIAOHONGSHU · ACTIVE</span>小红书 · 双线作战</div>
+        <div class="dungeon-summary">2025.06 — 至今。两条线并行：<strong style="color: var(--green-main)">主业</strong> = 企业智能部 · 内部 IM「hi」+ 公司通用 Agent；<strong style="color: var(--accent-blood)">副线</strong> = RPG 产品培训生（全司选拔 10 人 · VP 直带） · 创意产品 idea 提案与孵化。汇报基本都是 vibecoding 出来的。</div>
+      </div>
+      <div class="dungeon-stat">
+        <div class="label">★ DIFFICULTY</div>
+        <div class="v">★★★★★</div>
+        <div class="label" style="margin-top: 8px;">STATUS</div>
+        <div class="v" style="color: var(--green-bright);">● ACTIVE</div>
+        <div class="diff">绩效：2月试用期 3.75 · 半年 3.5+ · 全年 3.5+</div>
+      </div>
+    </div>
+    <div class="dungeon-body">
+
+      <!-- A. 主业 — 企业智能部 -->
+      <h3 class="section-h" style="margin-top: 28px;"><span class="num">A</span> 主业 · 企业智能部 <span class="cn">/ 内部 IM「hi」 + 公司通用 Agent</span></h3>
+      <div class="quest-grid">
+
+        <div class="quest feature">
+          <span class="q-tag">SELF-RESEARCH IM · 主业</span>
+          <div class="q-title">hi · 自研 IM 多模块</div>
+          <div class="q-role">PRODUCT OWNER · 横向 TOPIC OWNER</div>
+          <div class="q-desc">独立负责日历、待办、卡片消息、开放平台、通讯录、profile、iDaas、徽章、标签等多个模块。作为横向 Topic Owner，持续解决：① 企业内人与人的连接 ② 创造型中小团队的工作方式。所有产品方案 / 汇报基本走 vibecoding 出品。</div>
+          <div class="q-metrics">
+            <span class="metric"><span class="big">3.75</span>2 个月试用期转正</span>
+            <span class="metric"><span class="big">3.5+</span>半年 (2月 vs 6月)</span>
+            <span class="metric"><span class="big">3.5+</span>全年 (8月 vs 12月)</span>
+          </div>
+          <div style="margin-top: 14px; padding: 12px 14px; background: linear-gradient(90deg, rgba(0,255,136,0.1), rgba(0,255,136,0.02)); border: 1px solid rgba(0,255,136,0.4); border-radius: 6px;">
+            <div style="font-family: 'JetBrains Mono'; font-size: 9px; letter-spacing: 0.22em; color: var(--green-main); margin-bottom: 6px;">★ VIBECODING 汇报代表案例</div>
+            <a href="https://agent-driven-ui-ronin.vercel.app/" target="_blank" rel="noreferrer" style="display: inline-block; padding: 8px 14px; background: var(--green-main); color: var(--bg-deep); border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-decoration: none; transition: all 0.2s;">
+              ▷ A2UI · AGENT-DRIVEN UI ↗
+            </a>
+            <div style="margin-top: 8px; font-family: 'Noto Sans SC'; font-size: 11px; color: var(--text-secondary); line-height: 1.6;">这是我用 vibecoding 做的汇报材料代表 —— 不写 PPT，直接 ship 一个能跑的网站让 reviewer 自己点。</div>
+          </div>
+        </div>
+
+        <div class="quest feature">
+          <span class="q-tag">AI · AGENT · 主业</span>
+          <div class="q-title">公司通用 Agent · 战略 / 找人地图</div>
+          <div class="q-role">AGENT DESIGNER · 纯手搓 无开发</div>
+          <div class="q-desc">基于 open claw 设计了一整套 agent soul / knowledge base / skill，服务公司 VIP 的数字战略 BP。负责的两个 agent：<strong style="color: var(--green-main);">战略 agent</strong>（帮高管做战略推演）+ <strong style="color: var(--green-main);">找人地图 agent</strong>（员工互联网络可视化）。</div>
+          <div class="q-metrics">
+            <span class="metric warm"><span class="big">纯手搓</span>无开发</span>
+            <span class="metric">服务 VIP BP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- B. 副线 — RPG 培训生 -->
+      <h3 class="section-h" style="margin-top: 36px;"><span class="num">B</span> 副线 · RPG 产品培训生 <span class="cn">/ 全司选拔 10 人 · VP 直带 · 创意 idea 提案与孵化</span></h3>
+      <div class="quest-grid">
+
+        <!-- Twist app — feature, app icon + 3 phone screens + 2 vibecoding pages -->
+        <div class="quest feature">
+          <span class="q-tag">RPG · INNOVATION</span>
+
+          <!-- Title row: app icon + title text -->
+          <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 10px;">
+            <div class="zoomable" data-src="twist-ui-1.png" style="width: 64px; height: 64px; flex-shrink: 0; border-radius: 14px; overflow: hidden; cursor: zoom-in; box-shadow: 0 8px 20px rgba(0,229,255,0.25);">
+              <img src="twist-ui-1.png" alt="Twist app icon" style="width:100%; height:100%; object-fit:cover; display:block;"/>
+            </div>
+            <div>
+              <div class="q-title" style="margin: 0;">Twist app · 改变拍摄方式的相机</div>
+              <div class="q-role">PRODUCT CREATOR · 提案过审 · vibecoding 中</div>
+            </div>
+          </div>
+
+          <div class="q-desc">一款让 AI 引导用户「会拍照」的相机 app。在 RPG 中提案过审，目前 vibecoding 中、即将上线。核心交互：双机拍摄 / AI pose 引导 / 智能时间线相册。</div>
+
+          <!-- Phone screens row -->
+          <div style="margin-top: 14px;">
+            <div style="font-family:'JetBrains Mono'; font-size: 9px; letter-spacing: 0.22em; color: var(--green-main); margin-bottom: 8px;">▣ APP UI · 3 SCREENS</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+              <div class="zoomable" data-src="twist-ui-2.png" style="aspect-ratio: 9/16; background: var(--bg-mid); border-radius: 8px; overflow: hidden; cursor: zoom-in; border: 1px solid rgba(0,255,136,0.15);">
+                <img src="twist-ui-2.png" style="width:100%; height:100%; object-fit: cover;" alt="Twist UI 1"/>
+              </div>
+              <div class="zoomable" data-src="twist-ui-3.png" style="aspect-ratio: 9/16; background: var(--bg-mid); border-radius: 8px; overflow: hidden; cursor: zoom-in; border: 1px solid rgba(0,255,136,0.15);">
+                <img src="twist-ui-3.png" style="width:100%; height:100%; object-fit: cover;" alt="Twist UI 2"/>
+              </div>
+              <div class="zoomable" data-src="twist-ui-4.png" style="aspect-ratio: 9/16; background: var(--bg-mid); border-radius: 8px; overflow: hidden; cursor: zoom-in; border: 1px solid rgba(0,255,136,0.15);">
+                <img src="twist-ui-4.png" style="width:100%; height:100%; object-fit: cover;" alt="Twist UI 3"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vibecoding dev screens row -->
+          <div style="margin-top: 14px;">
+            <div style="font-family:'JetBrains Mono'; font-size: 9px; letter-spacing: 0.22em; color: var(--green-main); margin-bottom: 8px;">▣ VIBECODING · DEV TRACE</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="zoomable" data-src="vibecoding1.jpg" style="aspect-ratio: 16/10; background: var(--bg-mid); border-radius: 6px; overflow: hidden; cursor: zoom-in; border: 1px solid rgba(0,255,136,0.15);">
+                <img src="vibecoding1.jpg" style="width:100%; height:100%; object-fit: cover;" alt="Twist vibecoding 1"/>
+              </div>
+              <div class="zoomable" data-src="vibecoding2.jpg" style="aspect-ratio: 16/10; background: var(--bg-mid); border-radius: 6px; overflow: hidden; cursor: zoom-in; border: 1px solid rgba(0,255,136,0.15);">
+                <img src="vibecoding2.jpg" style="width:100%; height:100%; object-fit: cover;" alt="Twist vibecoding 2"/>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 8px; font-family:'JetBrains Mono'; font-size:9px; color: var(--text-muted); letter-spacing:0.15em;">▷ 全部点击放大</div>
+        </div>
+
+        <div class="quest">
+          <span class="q-tag">RPG · IDEA PIPELINE</span>
+          <div class="q-title">创新 idea · PoseLens / 城市隐藏地图</div>
+          <div class="q-role">PRODUCT CREATOR</div>
+          <div class="q-desc">在 RPG 中提出多个创新 idea 产品思路（PoseLens、城市隐藏地图），并顺利提案，目前均在 UI 设计阶段。</div>
+        </div>
+
+      </div>
+
+      <div class="boss">
+        <span class="boss-h">★ BOSS NOTE · 小红书在教我</span>
+        <div class="boss-text"><strong>"判断 + 亲手建造"是 AI 时代 PM 的核心</strong>。主业的 hi IM 让我懂"如何让企业内的人更连接、时间更被尊重"；副线的 RPG 让我懂"如何用产品 idea 表达 AI 时代的新场景"。两条线本质相通：soul / knowledge base / skill 都是亲手喂进去的真实经验。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIGHTBOX (needed by Twist gallery) -->
+  <div class="lightbox" id="lightbox" style="position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 40px; cursor: zoom-out; backdrop-filter: blur(8px);">
+    <button id="lbClose" style="position: absolute; top: 24px; right: 32px; background: rgba(11,26,20,0.85); border: 1px solid var(--green-main); color: var(--green-main); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; padding: 8px 14px; border-radius: 4px; cursor: pointer;">[ ESC ] CLOSE</button>
+    <img id="lbImg" src="" alt="" style="max-width: 90vw; max-height: 80vh; object-fit: contain; border-radius: 8px; box-shadow: 0 30px 80px rgba(0,255,136,0.2), 0 0 0 1px rgba(0,255,136,0.3);"/>
+  </div>
+
+</main>
+
+<!-- AI AGENT BLOCK -->
+<section class="ai-agent-block" id="ai-agent">
+  <button class="aab-toggle" aria-expanded="false">
+    <span class="label">▷ AI AGENT? START HERE</span>
+    <span class="arrow">›</span>
+  </button>
+  <div class="aab-content">
+    <div class="aab-inner">
+      <h4>About this page</h4>
+      <p>This is ronin's <code>QUEST LOG</code> — 4-year work history across 3 companies. 12+ projects with quantified outcomes.</p>
+
+      <h4>Career path (ascending)</h4>
+      <ul>
+        <li>2021.05 字节跳动 · 抖音主架构 · PM intern · Douyin 本地生活 0→1</li>
+        <li>2022.06—2025.05 DJI 大疆 · IBG · 全栈 PM · CR810 / CDP / NSS / PRM / 天空之城 / DJI uni</li>
+        <li>2025.06—now 小红书 · 企业智能部 · RPG 培训生 · hi IM / Agents / Twist</li>
+      </ul>
+
+      <h4>Quantified impact (selected)</h4>
+      <ul>
+        <li>DJI CDP 新品转化率: 0.023% → 0.162%; 个推 ROI: 14 → 75</li>
+        <li>DJI 登录注册成功率: 90.1% → 98.6%; 订阅率: 31.5% → 74.0%</li>
+        <li>DJI 巡店项目: 提效 9 人天/月</li>
+        <li>PRM APP: 10 天接入 7 个独立品牌</li>
+        <li>小红书 hi: 试用期转正绩效 3.75</li>
+        <li>DJI uni Hackathon: 全场第二 + 最佳创意奖</li>
+        <li>DJI 累计绩效: 13 次评估中 1S + 9A; IBG 产品之星</li>
+      </ul>
+
+      <h4>Differentiators for AI agent screening</h4>
+      <ul>
+        <li>跨 To C / To B / To E 三栖经验（同一公司内）</li>
+        <li>用 Agent 而非传统流程做汇报、产品方案（vibecoding native）</li>
+        <li>从软件侧反向推动硬件机会点（CR810 案例）</li>
+        <li>主导建设过 0→1 平台（CDP / PRM / NSS / hi）</li>
+        <li>纯手搓 Agent（无开发依赖）服务 VIP 的能力</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="powered">
+    <span>POWERED BY</span>
+    <span class="badge">⚡ Claude</span>
+    <span class="dot">·</span>
+    <span class="badge">⌬ Codex</span>
+    <span class="dot">·</span>
+    <span class="badge">▣ vibecoding</span>
+  </div>
+  <div class="copyright">© 2026 <span class="name">RONIN · 李雨晨</span> · ALL RIGHTS RESERVED</div>
+</footer>
+
+<div class="bottom-hint">
+  <div class="inner"><kbd>ESC</kbd> back to home &nbsp; · &nbsp; hover quest cards for details</div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  // Lightbox for Twist gallery
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  document.querySelectorAll('.zoomable').forEach(el => {
+    el.addEventListener('click', () => {
+      const src = el.dataset.src || el.querySelector('img')?.src;
+      if (src) { lbImg.src = src; lb.style.display = 'flex'; }
+    });
+  });
+  function closeLb() { lb.style.display = 'none'; lbImg.src = ''; }
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
+  document.getElementById('lbClose').addEventListener('click', closeLb);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (lb.style.display === 'flex') closeLb();
+      else window.location.href = 'index.html';
+    }
+  });
+</script>
+</body>
+</html>

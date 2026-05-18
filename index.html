@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RONIN.SYS — AI Native PM</title>
+<meta name="description" content="ronin / 李雨晨 的个人简历。一个 ENFP 产品经理的源代码 —— 用作品本身证明 AI native。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<style>
+  /* ============================================================
+     LOADING OVERLAY — ASCII binary ring → avatar reveal
+     ============================================================ */
+  .load-overlay {
+    position: fixed;
+    inset: 0;
+    background: #050a08;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.7s cubic-bezier(.4,0,.2,1);
+  }
+  .load-overlay.fade-out { opacity: 0; pointer-events: none; }
+  .load-overlay.hidden { display: none; }
+
+  .load-stage {
+    position: relative;
+    width: 420px; height: 420px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* outer ring */
+  .load-ring {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--green-main);
+    border-radius: 50%;
+    box-shadow:
+      0 0 50px rgba(0,255,136,0.3),
+      inset 0 0 40px rgba(0,255,136,0.1);
+    animation: ring-rotate 12s linear infinite, ring-pulse 2s ease-in-out infinite;
+  }
+  .load-ring::before, .load-ring::after {
+    content: '';
+    position: absolute;
+    width: 12px; height: 12px;
+    background: var(--green-bright);
+    border-radius: 50%;
+    box-shadow: 0 0 16px var(--green-main);
+  }
+  .load-ring::before { top: -6px; left: 50%; transform: translateX(-50%); }
+  .load-ring::after  { bottom: -6px; left: 50%; transform: translateX(-50%); }
+  @keyframes ring-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes ring-pulse { 0%, 100% { box-shadow: 0 0 50px rgba(0,255,136,0.3), inset 0 0 40px rgba(0,255,136,0.1); } 50% { box-shadow: 0 0 70px rgba(0,255,136,0.5), inset 0 0 60px rgba(0,255,136,0.2); } }
+
+  /* ASCII split into upper / lower halves with counter in between */
+  .load-content {
+    position: absolute;
+    inset: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    pointer-events: none;
+  }
+  .load-ascii-up, .load-ascii-dn {
+    color: var(--green-main);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.25;
+    letter-spacing: 2px;
+    text-align: center;
+    text-shadow: 0 0 8px rgba(0,255,136,0.6);
+    white-space: pre;
+  }
+  .load-ascii-up .row, .load-ascii-dn .row { opacity: 0.55; }
+  .load-ascii-up .row.bright, .load-ascii-dn .row.bright { opacity: 1; color: var(--green-bright); text-shadow: 0 0 12px var(--green-main); }
+
+  /* central counter */
+  .load-counter {
+    position: relative;
+    z-index: 2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 36px;
+    color: var(--green-bright);
+    text-shadow: 0 0 14px var(--green-main);
+    letter-spacing: 0.08em;
+    line-height: 1;
+    padding: 4px 14px;
+  }
+  .load-counter .div { color: var(--text-muted); margin: 0 6px; }
+  .load-counter .total { color: var(--text-secondary); font-size: 22px; }
+  .load-counter .pct { color: var(--text-muted); font-size: 20px; margin-left: 4px; }
+
+  /* status text under ring */
+  .load-status {
+    position: absolute;
+    bottom: -56px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    color: var(--green-main);
+    text-shadow: 0 0 6px rgba(0,255,136,0.4);
+    white-space: nowrap;
+  }
+  .load-status .blink { animation: cursor-blink 0.8s steps(2) infinite; }
+
+  /* avatar reveal */
+  .load-avatar {
+    position: absolute;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: var(--bg-mid);
+    background-image: url("头像.png");
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 0 40px rgba(0,255,136,0.4), inset 0 0 0 2px var(--green-main);
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.6s cubic-bezier(.22,.61,.36,1), transform 0.7s cubic-bezier(.22,.61,.36,1);
+    z-index: 3;
+  }
+  .load-avatar.show { opacity: 1; transform: scale(1); }
+
+  /* once at avatar phase, hide the ascii */
+  .load-stage.phase-2 .load-content { opacity: 0; transition: opacity 0.4s; }
+
+  /* ============================================================
+     SCENE — hero (v6 approved)
+     ============================================================ */
+  .scene { position: fixed; inset: 0; overflow: hidden; background: var(--bg-deep); }
+
+  .layer-bg {
+    position: absolute; inset: -2%;
+    background-image: url("背景.png"); background-size: cover; background-position: center;
+    filter: brightness(0.62) contrast(1.08) saturate(0.85);
+    animation: breath-bg 4.5s ease-in-out infinite;
+    will-change: transform; transform-origin: 50% 50%; z-index: 1;
+  }
+  .layer-haze {
+    position: absolute; inset: -5%;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 50%, rgba(120,180,200,0.10), transparent 65%),
+      radial-gradient(ellipse 40% 30% at 70% 25%, rgba(160,210,230,0.08), transparent 60%);
+    animation: breath-haze 5s ease-in-out infinite;
+    mix-blend-mode: screen; z-index: 2; pointer-events: none;
+  }
+  .char-stack {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    animation: breath-char 4.5s ease-in-out infinite; will-change: transform;
+  }
+  .layer-char {
+    position: absolute; inset: 0;
+    background-image: url("人物_clean.png"); background-size: auto 76%;
+    background-position: 90% bottom; background-repeat: no-repeat;
+    /* DARKER — was 0.96 brightness, now 0.74; also dim saturate further */
+    filter: drop-shadow(0 14px 30px rgba(0,0,0,0.6)) brightness(0.74) contrast(1.08) saturate(0.78);
+  }
+  .layer-hair {
+    position: absolute; inset: 0;
+    background-image: url("人物_clean.png"); background-size: auto 76%;
+    background-position: 90% bottom; background-repeat: no-repeat;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 12%, rgba(0,0,0,0.5) 18%, transparent 24%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 12%, rgba(0,0,0,0.5) 18%, transparent 24%);
+    transform-origin: 90% 22%;
+    animation: hair-sway 4.7s ease-in-out infinite;
+    opacity: 0.55; pointer-events: none;
+    filter: brightness(0.74) saturate(0.78);
+  }
+  .layer-glow {
+    position: absolute; inset: 0; z-index: 4; pointer-events: none;
+    animation: breath-char 4.5s ease-in-out infinite;
+  }
+  .glow-ball {
+    position: absolute; top: 30%; right: 12%;
+    width: 200px; height: 200px;
+    /* warm white glow — natural flashlight color, no longer the weird blue */
+    background: radial-gradient(circle, rgba(255,245,210,0.70) 0%, rgba(240,225,170,0.22) 28%, transparent 60%);
+    mix-blend-mode: screen; animation: glow-pulse 2.4s ease-in-out infinite; filter: blur(2px);
+  }
+  .light-cone {
+    position: absolute; top: 33%; right: 3%;
+    width: 280px; height: 200px;
+    background: radial-gradient(ellipse 80% 60% at 90% 50%, rgba(255,235,180,0.16) 0%, transparent 65%);
+    mix-blend-mode: screen; transform: rotate(6deg);
+    animation: cone-pulse 2.4s ease-in-out infinite;
+  }
+  .layer-fore { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+  .dust {
+    position: absolute; width: 3px; height: 3px;
+    background: rgba(180,220,200,0.45); border-radius: 50%;
+    box-shadow: 0 0 6px rgba(180,220,200,0.5);
+  }
+  .layer-vignette {
+    position: absolute; inset: 0; z-index: 6; pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at center, transparent 40%, rgba(8,16,12,0.4) 85%, rgba(0,0,0,0.65) 100%),
+      linear-gradient(180deg, rgba(0,20,12,0.3) 0%, transparent 22%, transparent 78%, rgba(0,15,8,0.45) 100%);
+  }
+  .grain {
+    position: absolute; inset: 0; z-index: 7; pointer-events: none;
+    opacity: 0.05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    animation: grain-shift 0.6s steps(6) infinite;
+  }
+  .scanline {
+    position: absolute; inset: 0; z-index: 8; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+    animation: scanline-roll 8s linear infinite;
+  }
+  .flashlight {
+    position: absolute; inset: 0; z-index: 9;
+    pointer-events: none; mix-blend-mode: screen;
+    transition: background 0.08s linear;
+  }
+
+  /* hero UI */
+  .top-bar-hero {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 36px; pointer-events: none;
+  }
+  .top-bar-hero > * { pointer-events: auto; }
+  .top-right { text-align: right; line-height: 1.6; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; }
+  .top-right .row1 { color: var(--green-main); text-shadow: 0 0 8px rgba(0,255,136,0.4); }
+  .top-right .row2 { color: var(--text-muted); font-size: 9px; }
+
+  .main-stack {
+    position: absolute;
+    top: 80px;            /* below the top bar */
+    bottom: 80px;         /* above the hint bar */
+    left: 5%;
+    max-width: 50%;
+    z-index: 15;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;  /* vertically center within available space */
+  }
+  .main-stack > * { pointer-events: auto; }
+
+  .meta-line {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.4em; color: var(--green-main);
+    margin-bottom: 18px; text-shadow: 0 0 8px rgba(0,255,136,0.4);
+  }
+  .meta-line .sep { color: var(--text-muted); margin: 0 8px; }
+
+  .game-start {
+    font-family: 'Permanent Marker', 'Noto Sans SC', cursive;
+    font-size: clamp(2.6rem, 5.4vw, 4.6rem);
+    line-height: 1; color: var(--text-primary);
+    letter-spacing: 0.005em;
+    user-select: none; white-space: nowrap;
+    transform: skew(-3deg);
+    text-shadow: 0 4px 30px rgba(0,0,0,0.6), 0 0 24px rgba(0,255,136,0.08);
+    display: inline-block;
+  }
+  .game-start .letter { display: inline-block; position: relative; color: inherit; transition: color 0.05s; }
+  .game-start .letter.glitch {
+    color: var(--magenta-glitch);
+    text-shadow:
+      -2px 0 0 var(--cyan-glitch), 2px 0 0 var(--magenta-glitch),
+      0 0 18px rgba(255,26,163,0.5), 0 0 30px rgba(0,229,255,0.3);
+  }
+
+  .slogan {
+    margin-top: 24px;
+    padding: 6px 0 6px 16px;
+    border-left: 2px solid var(--green-main);
+    box-shadow: -1px 0 12px rgba(0,255,136,0.18);
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .slogan .line1 {
+    font-family: 'Special Elite', 'Noto Sans SC', monospace;
+    font-size: 15px; color: var(--text-primary);
+    line-height: 1.6; letter-spacing: 0.02em; min-height: 1.6em;
+  }
+  .slogan .line1 .cursor {
+    display: inline-block; width: 7px; height: 16px;
+    background: var(--green-main); margin-left: 2px;
+    vertical-align: middle; animation: cursor-blink 0.8s steps(2) infinite;
+    box-shadow: 0 0 6px var(--green-main);
+  }
+  .slogan .line2 { font-family: 'Noto Sans SC', sans-serif; font-size: 11px; color: var(--text-secondary); margin-top: 6px; letter-spacing: 0.16em; }
+  .slogan .line2 .arrow { color: var(--green-main); margin-right: 6px; }
+
+  .menu { margin-top: 28px; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .menu-item {
+    display: flex; align-items: baseline; gap: 20px;
+    color: var(--text-primary);
+    font-family: 'Permanent Marker', 'Noto Sans SC', cursive;
+    font-size: 22px; letter-spacing: 0.05em;
+    position: relative; cursor: pointer;
+    transform: skew(-3deg); user-select: none;
+    line-height: 1.4;
+    transition: padding 0.2s ease;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .menu-item .indicator { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: var(--green-main); width: 50px; text-align: right; transform: skew(3deg); }
+  .menu-item:not(.active) .indicator { color: var(--text-muted); }
+  .menu-item .label-cn { font-family: 'Noto Sans SC', sans-serif; font-size: 11px; color: var(--text-muted); margin-left: 10px; letter-spacing: 0.2em; transform: skew(3deg); font-weight: 300; }
+  .menu-item:hover, .menu-item.active { padding-left: 8px; }
+  .menu-item:hover .label-en, .menu-item.active .label-en { color: #fff; text-shadow: 0 0 12px rgba(0,255,136,0.55), 0 2px 10px rgba(0,0,0,0.5); }
+  .menu-item:hover .label-cn, .menu-item.active .label-cn { color: var(--green-main); }
+  .menu-item.illuminated .label-en { color: #fff; text-shadow: 0 0 14px rgba(180, 255, 200, 0.7), 0 2px 10px rgba(0,0,0,0.5); }
+  .menu-item.illuminated .label-cn { color: var(--green-glow); }
+
+  .ai-corner {
+    position: absolute; bottom: 70px; right: 36px; z-index: 20;
+    width: 280px; padding: 12px 14px;
+    border: 1px solid rgba(0,255,136,0.25);
+    background: rgba(13, 26, 22, 0.78);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    font-size: 10px; letter-spacing: 0.16em;
+    color: var(--text-secondary); line-height: 1.7;
+    cursor: pointer; border-radius: 2px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .ai-corner:hover { border-color: var(--green-main); background: rgba(15, 38, 28, 0.92); box-shadow: 0 0 20px rgba(0,255,136,0.18); }
+  .ai-corner .label { color: var(--green-main); font-weight: 600; font-family: 'JetBrains Mono', monospace; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .ai-corner .label .blink { animation: cursor-blink 1.4s steps(2) infinite; color: var(--green-bright); }
+  .ai-corner .desc { font-family: 'Noto Sans SC', sans-serif; font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; }
+
+  .hint-bar {
+    position: absolute; bottom: 20px; left: 0; right: 0; z-index: 20;
+    display: flex; justify-content: space-between; padding: 0 40px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.16em; color: var(--text-muted); pointer-events: none;
+  }
+  .hint-bar kbd { display: inline-block; padding: 1px 6px; border: 1px solid var(--text-muted); border-radius: 2px; margin: 0 4px; color: var(--text-secondary); font-family: inherit; font-size: 9px; }
+  .hint-bar .move-mouse { color: var(--green-main); }
+
+  /* hero keyframes */
+  @keyframes breath-bg {
+    0%   { transform: translate3d(-5px, -3px, 0) scale(1.004) rotate(-0.08deg); }
+    35%  { transform: translate3d(2px,  2px,  0) scale(1.008) rotate(0.10deg); }
+    70%  { transform: translate3d(6px, -1px, 0)  scale(1.005) rotate(-0.04deg); }
+    100% { transform: translate3d(-5px, -3px, 0) scale(1.004) rotate(-0.08deg); }
+  }
+  @keyframes breath-char {
+    0%   { transform: translate3d(-10px, -5px, 0) scale(1.007) rotate(-0.15deg); }
+    35%  { transform: translate3d(5px,   4px,  0) scale(1.012) rotate(0.18deg); }
+    70%  { transform: translate3d(12px, -2px,  0) scale(1.009) rotate(-0.06deg); }
+    100% { transform: translate3d(-10px, -5px, 0) scale(1.007) rotate(-0.15deg); }
+  }
+  @keyframes breath-haze { 0%, 100% { transform: translate(0, 0); opacity: 0.7; } 50% { transform: translate(6px, -3px); opacity: 0.95; } }
+  @keyframes hair-sway { 0%, 100% { transform: rotate(0deg) translate(0, 0); } 33% { transform: rotate(-0.6deg) translate(-1.5px, 0.5px); } 66% { transform: rotate(0.8deg) translate(1.5px, -0.5px); } }
+  @keyframes glow-pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.15); } }
+  @keyframes cone-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.85; } }
+  @keyframes scanline-roll { from { background-position: 0 0; } to { background-position: 0 30px; } }
+  @keyframes dust-drift { 0% { transform: translate(0,0); opacity: 0; } 10% { opacity: 0.5; } 90% { opacity: 0.5; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+
+  @media (max-width: 1000px) { .main-stack { max-width: 86%; } .ai-corner { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- ============== LOADING OVERLAY ============== -->
+<div class="load-overlay" id="loadOverlay">
+  <div class="load-stage" id="loadStage">
+    <div class="load-ring"></div>
+    <div class="load-content">
+      <div class="load-ascii-up" id="loadAsciiUp"></div>
+      <div class="load-counter" id="loadCounter">00<span class="div">/</span><span class="total">100</span><span class="pct">%</span></div>
+      <div class="load-ascii-dn" id="loadAsciiDn"></div>
+    </div>
+    <div class="load-avatar" id="loadAvatar"></div>
+    <div class="load-status" id="loadStatus">BOOTING RONIN.SYS<span class="blink">_</span></div>
+  </div>
+</div>
+
+<!-- ============== HERO SCENE ============== -->
+<div class="scene">
+  <div class="layer-bg"></div>
+  <div class="layer-haze"></div>
+  <div class="char-stack">
+    <div class="layer-char"></div>
+    <div class="layer-hair"></div>
+  </div>
+  <div class="layer-glow">
+    <div class="glow-ball"></div>
+    <div class="light-cone"></div>
+  </div>
+  <div class="layer-fore" id="dustLayer"></div>
+  <div class="layer-vignette"></div>
+  <div class="grain"></div>
+  <div class="scanline"></div>
+  <div class="flashlight" id="flashlight"></div>
+
+  <header class="top-bar-hero">
+    <a class="wordmark" href="index.html">
+      <img src="头像.png" alt="ronin"/>
+      <div class="name">RONIN<span>.SYS</span></div>
+    </a>
+    <div class="top-right">
+      <div class="row1">[ SYSTEM ONLINE ]</div>
+      <div class="row2">v1.0 · 2026.05.18 · BUILD a1f0</div>
+    </div>
+  </header>
+
+  <main class="main-stack">
+    <div class="meta-line">
+      RONIN <span class="sep">/</span> AI-NATIVE PM <span class="sep">/</span> ENFP MODE
+    </div>
+    <h1 class="game-start" id="title"></h1>
+    <div class="slogan">
+      <p class="line1" id="line1"><span class="cursor"></span></p>
+      <p class="line2"><span class="arrow">↳</span>—— 全栈产品经理</p>
+    </div>
+    <nav class="menu">
+      <a class="menu-item active" href="player.html">
+        <span class="indicator">START</span>
+        <span class="label-en">PLAYER</span>
+        <span class="label-cn">角色面板</span>
+      </a>
+      <a class="menu-item" href="quest-log.html">
+        <span class="indicator">&gt;</span>
+        <span class="label-en">QUEST LOG</span>
+        <span class="label-cn">通关记录</span>
+      </a>
+      <a class="menu-item" href="idea-lab.html">
+        <span class="indicator">&gt;</span>
+        <span class="label-en">IDEA LAB</span>
+        <span class="label-cn">思想军火库</span>
+      </a>
+      <a class="menu-item" href="ronin-agent.html">
+        <span class="indicator">&gt;</span>
+        <span class="label-en">RONIN AGENT</span>
+        <span class="label-cn">灵魂副本</span>
+      </a>
+      <a class="menu-item" href="sync-test.html">
+        <span class="indicator">&gt;</span>
+        <span class="label-en">SYNC TEST</span>
+        <span class="label-cn">默契挑战</span>
+      </a>
+      <a class="menu-item" href="contact.html">
+        <span class="indicator">&gt;</span>
+        <span class="label-en">CONTACT</span>
+        <span class="label-cn">好友代码</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="ai-corner" id="aiCornerHero">
+    <div class="label"><span>▷ AI AGENT? START HERE</span><span class="blink">_</span></div>
+    <div class="desc">面试官的 AI 可以从这里读懂整个网站。</div>
+  </aside>
+
+  <div class="hint-bar">
+    <div class="move-mouse">⊕ MOVE MOUSE — flashlight follows</div>
+    <div><kbd>↑</kbd><kbd>↓</kbd> NAVIGATE &nbsp;·&nbsp; <kbd>↵</kbd> SELECT</div>
+  </div>
+
+  <!-- hero-footer: small inline copyright + powered by -->
+  <div style="position: absolute; bottom: 46px; left: 0; right: 0; z-index: 20; display: flex; justify-content: center; pointer-events: none;">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em; color: var(--text-muted); display: flex; gap: 14px; align-items: center;">
+      <span>© 2026 <span style="color: var(--text-secondary);">RONIN · 李雨晨</span></span>
+      <span style="color: var(--text-muted);">·</span>
+      <span>POWERED BY <strong style="color: var(--green-main); text-shadow: 0 0 6px rgba(0,255,136,0.4);">CLAUDE</strong> · <strong style="color: var(--green-main); text-shadow: 0 0 6px rgba(0,255,136,0.4);">CODEX</strong></span>
+    </div>
+  </div>
+</div>
+
+<!-- Loader + Hero behavior -->
+<script src="app.js"></script>
+<script>
+  // ============== LOADING ANIMATION ==============
+  const loadOverlay = document.getElementById('loadOverlay');
+  const loadStage = document.getElementById('loadStage');
+  const loadAsciiUp = document.getElementById('loadAsciiUp');
+  const loadAsciiDn = document.getElementById('loadAsciiDn');
+  const loadCounter = document.getElementById('loadCounter');
+  const loadAvatar = document.getElementById('loadAvatar');
+  const loadStatus = document.getElementById('loadStatus');
+
+  // ASCII split into upper / lower halves so counter sits cleanly in between
+  const ROWS_UP = [
+    '·  /  ·',
+    ' /6/6/ ',
+    '/0/6/0/'
+  ];
+  const ROWS_DN = [
+    '/0/6/0/',
+    ' /6/6/ ',
+    '·  /  ·'
+  ];
+  function renderHalf(target, rows) {
+    const html = rows.map(r => {
+      const chars = r.split('').map(c => {
+        if (c === '/' || c === ' ' || c === '·') return c;
+        return Math.random() > 0.7 ? (Math.random() > 0.5 ? '0' : '6') : c;
+      }).join('');
+      const cls = (Math.random() > 0.85) ? 'row bright' : 'row';
+      return `<div class="${cls}">${chars}</div>`;
+    }).join('');
+    target.innerHTML = html;
+  }
+  function renderAscii() {
+    renderHalf(loadAsciiUp, ROWS_UP);
+    renderHalf(loadAsciiDn, ROWS_DN);
+  }
+
+  function runLoadingThenHero() {
+    const PHASE_1_MS = 2800;
+    const PHASE_2_MS = 900;
+    const PHASE_3_MS = 600;
+    const TOTAL_MS = PHASE_1_MS + PHASE_2_MS + PHASE_3_MS;
+
+    const start = performance.now();
+    let asciiTimer = setInterval(() => renderAscii(), 140);
+
+    function loop() {
+      const t = performance.now() - start;
+      if (t < PHASE_1_MS) {
+        const p = t / PHASE_1_MS;
+        // ease-out — 0-50 快、50-100 慢；总时长不变
+        const eased = 1 - Math.pow(1 - p, 2.4);
+        const n = Math.floor(eased * 100);
+        loadCounter.innerHTML = `${String(n).padStart(3, '0')}<span class="div">/</span><span class="total">100</span><span class="pct">%</span>`;
+        requestAnimationFrame(loop);
+      } else if (t < PHASE_1_MS + PHASE_2_MS) {
+        clearInterval(asciiTimer);
+        loadStage.classList.add('phase-2');
+        loadAvatar.classList.add('show');
+        loadCounter.innerHTML = `100<span class="div">/</span><span class="total">100</span><span class="pct">%</span>`;
+        loadStatus.innerHTML = 'READY <span class="blink">_</span>';
+        requestAnimationFrame(loop);
+      } else if (t < TOTAL_MS) {
+        loadOverlay.classList.add('fade-out');
+        requestAnimationFrame(loop);
+      } else {
+        loadOverlay.classList.add('hidden');
+        // only mark booted AFTER loading actually completes
+        sessionStorage.setItem('ronin_booted', '1');
+        startHero();
+      }
+    }
+    renderAscii();
+    requestAnimationFrame(loop);
+  }
+
+  // ============== BOOT — always show loading (ronin: every visit) ==============
+  runLoadingThenHero();
+
+  // ============== HERO ==============
+  function startHero() {
+    // letter glitch on GAME START
+    const titleText = "GAME START";
+    const titleEl = document.getElementById('title');
+    const letterEls = [];
+    titleText.split('').forEach((ch) => {
+      const span = document.createElement('span');
+      span.className = 'letter';
+      if (ch === ' ') span.innerHTML = '&nbsp;';
+      else span.textContent = ch;
+      span.dataset.c = ch === ' ' ? ' ' : ch;
+      titleEl.appendChild(span);
+      if (ch !== ' ') letterEls.push(span);
+    });
+    const SPECIALS = ['@', '$', '?'];
+    function flickerOne() {
+      const delay = 1500 + Math.random() * 1500;
+      setTimeout(() => {
+        const target = letterEls[Math.floor(Math.random() * letterEls.length)];
+        const original = target.dataset.c;
+        target.classList.add('glitch');
+        let i = 0;
+        const tk = setInterval(() => {
+          if (i < SPECIALS.length) { target.textContent = SPECIALS[i]; i++; }
+          else { target.textContent = original; target.classList.remove('glitch'); clearInterval(tk); flickerOne(); }
+        }, 120);
+      }, delay);
+    }
+    setTimeout(flickerOne, 1500);
+
+    // looping typewriter
+    const slogan = "值得我干翻的是天下会的会长、是十佬 ( ´▽｀)";
+    const line1 = document.getElementById('line1');
+    loopTypewriter(line1, slogan);
+
+    // mouse flashlight
+    const flashlight = document.getElementById('flashlight');
+    const menuItems = document.querySelectorAll('.menu-item');
+    document.addEventListener('mousemove', (e) => {
+      const mx = e.clientX, my = e.clientY;
+      flashlight.style.background = `radial-gradient(circle 280px at ${mx}px ${my}px,
+        rgba(190,255,210,0.20) 0%,
+        rgba(90,250,170,0.06) 30%,
+        rgba(0,255,136,0.02) 55%,
+        transparent 75%)`;
+      menuItems.forEach((item) => {
+        const r = item.getBoundingClientRect();
+        const cx = r.left + r.width/2, cy = r.top + r.height/2;
+        const d = Math.hypot(cx - mx, cy - my);
+        if (d < 260) item.classList.add('illuminated'); else item.classList.remove('illuminated');
+      });
+    });
+
+    // dust
+    const dustLayer = document.getElementById('dustLayer');
+    for (let i = 0; i < 25; i++) {
+      const d = document.createElement('div');
+      d.className = 'dust';
+      d.style.left = Math.random()*100 + 'vw';
+      d.style.top = (60 + Math.random()*40) + 'vh';
+      d.style.setProperty('--dx', (Math.random()-0.5)*120 + 'px');
+      d.style.setProperty('--dy', -(40+Math.random()*150) + 'px');
+      const dur = 10 + Math.random()*10;
+      d.style.animation = `dust-drift ${dur}s linear ${Math.random()*10}s infinite`;
+      d.style.opacity = 0.25 + Math.random()*0.3;
+      dustLayer.appendChild(d);
+    }
+
+    // menu interactions: keyboard nav
+    let currentIdx = 0;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { currentIdx = (currentIdx+1)%menuItems.length; updateActive(); }
+      else if (e.key === 'ArrowUp') { currentIdx = (currentIdx-1+menuItems.length)%menuItems.length; updateActive(); }
+      else if (e.key === 'Enter') { window.location.href = menuItems[currentIdx].getAttribute('href'); }
+    });
+    menuItems.forEach((item) => {
+      item.addEventListener('mouseenter', () => {
+        menuItems.forEach(m => { m.classList.remove('active'); m.querySelector('.indicator').textContent = '>'; });
+        item.classList.add('active'); item.querySelector('.indicator').textContent = 'START';
+      });
+    });
+    function updateActive() {
+      menuItems.forEach((m, i) => {
+        m.classList.toggle('active', i === currentIdx);
+        m.querySelector('.indicator').textContent = i === currentIdx ? 'START' : '>';
+      });
+    }
+
+    // AI corner → scroll to a virtual overlay (mock for now)
+    document.getElementById('aiCornerHero').addEventListener('click', () => {
+      // For hero, we can just go to player.html which has the AI agent block
+      window.location.href = 'player.html#ai-agent';
+    });
+  }
+</script>
+
+</body>
+</html>

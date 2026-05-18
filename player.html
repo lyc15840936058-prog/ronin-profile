@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PLAYER · 角色档案 — RONIN.SYS</title>
+<meta name="description" content="ronin / 李雨晨 的角色档案。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<style>
+  /* ====================================================
+     HERO COLLAGE
+     ==================================================== */
+  .hero-collage { position: relative; margin: 0 0 60px; padding: 24px 0 40px; min-height: 440px; }
+  .cl-chibi {
+    position: absolute; top: 16px; left: 0;
+    width: 172px; height: 172px;
+    background: linear-gradient(135deg, #2a3a32, #1a2620);
+    border: 1px solid rgba(0,255,136,0.3); border-radius: 14px;
+    overflow: hidden; transform: rotate(-4deg);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(0,255,136,0.1);
+    z-index: 3; transition: transform 0.3s;
+  }
+  .cl-chibi:hover { transform: rotate(-4deg) scale(1.04); }
+  .cl-chibi::before { content: 'PROTAGONIST'; position: absolute; top: 7px; left: 10px; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.2em; color: var(--green-main); z-index: 2; text-shadow: 0 0 6px rgba(0,255,136,0.5); }
+  .cl-chibi img { width: 100%; height: 100%; object-fit: cover; filter: brightness(1.05); }
+  .cl-chibi::after { content: 'LV.26'; position: absolute; bottom: 6px; right: 10px; font-family: 'Bebas Neue'; font-size: 18px; color: var(--green-bright); text-shadow: 0 0 10px rgba(0,255,136,0.5); letter-spacing: 0.05em; }
+
+  .cl-identity { position: relative; margin: 0 460px 0 200px; padding: 12px 0 0 24px; z-index: 2; }
+  .cl-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.8rem, 5.4vw, 4.6rem); line-height: 0.92; color: var(--text-primary); letter-spacing: 0.04em; text-shadow: 0 4px 30px rgba(0,0,0,0.6), 0 0 24px rgba(0,255,136,0.08); }
+  .cl-name .cn { display: block; font-family: 'Noto Sans SC'; font-size: 0.28em; font-weight: 300; color: var(--green-main); letter-spacing: 0.4em; margin-bottom: 10px; }
+  .cl-class { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.25em; color: var(--green-main); margin: 12px 0 16px; }
+  .cl-class .sep { color: var(--text-muted); margin: 0 8px; }
+  .cl-bubble { position: relative; display: inline-block; padding: 12px 20px; background: rgba(24,42,35,0.85); border: 1px solid rgba(0,255,136,0.3); border-radius: 16px; font-family: 'Special Elite', monospace; font-size: 13px; color: var(--text-primary); line-height: 1.55; max-width: 540px; transform: rotate(0.6deg); box-shadow: 0 8px 24px rgba(0,0,0,0.4); margin-top: 10px; }
+  .cl-bubble::before { content: ''; position: absolute; left: -8px; top: 16px; width: 0; height: 0; border: 8px solid transparent; border-right-color: rgba(24,42,35,0.85); border-left: 0; }
+  .cl-bubble strong { color: var(--green-main); }
+
+  .cl-tags { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .cl-tag { padding: 6px 14px; background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(11,26,20,0.6)); border: 1px solid rgba(0,255,136,0.3); border-radius: 999px; font-family: 'Noto Sans SC', sans-serif; font-size: 12px; color: var(--green-glow); letter-spacing: 0.04em; box-shadow: 0 2px 8px rgba(0,0,0,0.3); transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+  .cl-tag:hover { background: rgba(0,255,136,0.15); border-color: var(--green-main); transform: translateY(-1px); }
+  .cl-tag.tag-pro  { color: var(--green-bright); border-color: rgba(0,255,65,0.5); background: linear-gradient(135deg, rgba(0,255,65,0.12), rgba(11,26,20,0.6)); }
+  .cl-tag.tag-warn { color: var(--accent-warn); border-color: rgba(255,217,61,0.45); background: linear-gradient(135deg, rgba(255,217,61,0.1), rgba(11,26,20,0.6)); }
+  .cl-tag.tag-fun  { color: #ff7585; border-color: rgba(255,74,94,0.45); background: linear-gradient(135deg, rgba(255,74,94,0.1), rgba(11,26,20,0.6)); }
+  .cl-tag.tag-cute { color: #d4a3ff; border-color: rgba(180,140,255,0.45); background: linear-gradient(135deg, rgba(180,140,255,0.1), rgba(11,26,20,0.6)); }
+
+  /* right-side stacked deck — uses real life photos now */
+  .cl-deck { position: absolute; top: 16px; right: 0; width: 440px; height: 420px; z-index: 2; }
+  .cl-deck .deck-card { position: absolute; border-radius: 12px; overflow: hidden; background: var(--bg-mid); border: 1px solid rgba(0,255,136,0.22); box-shadow: 0 16px 40px rgba(0,0,0,0.55); transition: transform 0.4s cubic-bezier(.22,.61,.36,1), box-shadow 0.3s, z-index 0s 0.4s; cursor: pointer; }
+  .cl-deck .deck-card:hover { z-index: 100; box-shadow: 0 24px 60px rgba(0,255,136,0.25), 0 0 0 1px var(--green-main); transition: transform 0.4s cubic-bezier(.22,.61,.36,1), box-shadow 0.3s, z-index 0s 0s; }
+  .cl-deck .deck-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cl-deck .deck-card .dc-label { position: absolute; top: 8px; left: 10px; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.2em; color: var(--green-main); background: rgba(11,26,20,0.85); padding: 2px 6px; border-radius: 2px; z-index: 2; }
+  .cl-deck .deck-card .dc-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px 12px 10px; background: linear-gradient(180deg, transparent, rgba(11,26,20,0.95)); font-family: 'Noto Sans SC'; font-size: 11px; color: var(--text-primary); line-height: 1.4; }
+  .cl-deck .deck-card .dc-caption .role { display: block; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--green-main); letter-spacing: 0.15em; margin-top: 2px; }
+  .cl-deck .deck-card.bubble { background: rgba(20,30,26,0.95); border: 1px solid rgba(0,255,136,0.35); padding: 16px 18px; box-shadow: 0 12px 30px rgba(0,0,0,0.4), 0 0 0 4px rgba(0,255,136,0.06) inset; }
+  .cl-deck .deck-card.bubble .b-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: var(--green-main); margin-bottom: 6px; }
+  .cl-deck .deck-card.bubble .b-text { font-family: 'Noto Sans SC', sans-serif; font-size: 13px; color: var(--text-primary); line-height: 1.55; }
+  .cl-deck .c1 { top: 0;   left: 40px;  width: 200px; aspect-ratio: 1; transform: rotate(-7deg); z-index: 5; }
+  .cl-deck .c2 { top: 30px; left: 200px; width: 220px; height: 120px;  transform: rotate(3deg);  z-index: 4; }
+  .cl-deck .c3 { top: 130px; left: 70px; width: 180px; aspect-ratio: 4/5; transform: rotate(2deg); z-index: 3; }
+  .cl-deck .c4 { top: 160px; left: 230px; width: 200px; aspect-ratio: 4/5; transform: rotate(-5deg); z-index: 2; }
+  .cl-deck .c5 { top: 300px; left: 100px; width: 160px; aspect-ratio: 1; transform: rotate(4deg);  z-index: 1; }
+  .cl-deck .c1:hover { transform: rotate(0deg) scale(1.06); }
+  .cl-deck .c2:hover { transform: rotate(0deg) scale(1.06); }
+  .cl-deck .c3:hover { transform: rotate(0deg) scale(1.06); }
+  .cl-deck .c4:hover { transform: rotate(0deg) scale(1.06); }
+  .cl-deck .c5:hover { transform: rotate(0deg) scale(1.06); }
+
+  /* ====================================================
+     PHOTO WALL — STACKED PILE (absolute positioned overlapping cards)
+     ==================================================== */
+  .photo-wall-v2 {
+    position: relative;
+    width: 100%;
+    height: 880px;
+    margin-top: 18px;
+  }
+  .pw-item {
+    position: absolute;
+    width: 220px;
+    height: 180px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-mid);
+    border: 1px solid rgba(0,255,136,0.15);
+    cursor: zoom-in;
+    transition: transform 0.4s cubic-bezier(.22,.61,.36,1), box-shadow 0.3s, z-index 0s 0.4s;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+    transform: rotate(var(--tilt, 0deg));
+  }
+  .pw-item:hover {
+    border-color: var(--green-main);
+    box-shadow: 0 24px 60px rgba(0,255,136,0.3);
+    transform: rotate(0deg) scale(1.1) !important;
+    z-index: 200 !important;
+    transition: transform 0.4s cubic-bezier(.22,.61,.36,1), box-shadow 0.3s, z-index 0s 0s;
+  }
+  /* size variants — more hierarchy */
+  .pw-item.portrait      { width: 220px; height: 300px; }
+  .pw-item.portrait-big  { width: 260px; height: 360px; box-shadow: 0 14px 36px rgba(0,0,0,0.55); }
+  .pw-item.big           { width: 300px; height: 220px; }
+  .pw-item.feature       { width: 340px; height: 250px; box-shadow: 0 16px 40px rgba(0,0,0,0.55); }
+  .pw-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pw-item .ph-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(11,26,20,0.92) 100%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 12px 14px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .pw-item:hover .ph-overlay { opacity: 1; }
+  .pw-item .ph-label {
+    position: absolute; top: 8px; left: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.18em;
+    color: var(--green-main);
+    background: rgba(11,26,20,0.85);
+    padding: 2px 7px; border-radius: 3px;
+    z-index: 2;
+  }
+  .pw-item .ph-caption {
+    font-family: 'Noto Sans SC';
+    font-size: 12px;
+    color: var(--text-primary);
+    line-height: 1.45;
+  }
+  .pw-item .ph-zoom-hint {
+    position: absolute; top: 8px; right: 10px;
+    font-family: 'JetBrains Mono'; font-size: 8px;
+    color: var(--green-glow); letter-spacing: 0.18em;
+    background: rgba(11,26,20,0.85);
+    padding: 2px 6px; border-radius: 3px;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .pw-item:hover .ph-zoom-hint { opacity: 1; }
+  /* placeholders inside photo wall pieces */
+  .pw-item.empty {
+    border-style: dashed;
+    border-color: rgba(0,255,136,0.3);
+    cursor: default;
+  }
+  .pw-item.empty:hover { transform: rotate(0deg) scale(1); box-shadow: none; }
+  .pw-item.empty .ph-fallback {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    background: repeating-linear-gradient(45deg, rgba(0,255,136,0.04) 0, rgba(0,255,136,0.04) 12px, transparent 12px, transparent 24px), var(--bg-mid);
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono';
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    padding: 10px;
+  }
+  .pw-item.empty .ph-fallback strong { color: var(--accent-warn); font-size: 9px; margin-bottom: 4px; }
+  .pw-item.empty .ph-fallback span { font-family: 'Noto Sans SC'; font-size: 10px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* (removed grid spans — using absolute positioning now) */
+
+  /* ====================================================
+     LIGHTBOX
+     ==================================================== */
+  .lightbox {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 40px;
+    cursor: zoom-out;
+    backdrop-filter: blur(8px);
+  }
+  .lightbox.show { display: flex; animation: lb-in 0.3s cubic-bezier(.22,.61,.36,1); }
+  @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
+  .lb-content {
+    position: relative;
+    max-width: 90vw; max-height: 90vh;
+    display: flex; flex-direction: column;
+    align-items: center;
+    animation: lb-pop 0.4s cubic-bezier(.22,.61,.36,1);
+  }
+  @keyframes lb-pop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  .lb-img {
+    max-width: 90vw; max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 30px 80px rgba(0,255,136,0.2), 0 0 0 1px rgba(0,255,136,0.3);
+  }
+  .lb-caption {
+    margin-top: 16px;
+    font-family: 'Noto Sans SC';
+    font-size: 14px;
+    color: var(--text-primary);
+    text-align: center;
+    max-width: 720px;
+  }
+  .lb-caption .role { color: var(--green-main); font-family: 'JetBrains Mono'; font-size: 10px; letter-spacing: 0.18em; display: block; margin-bottom: 4px; }
+  .lb-close {
+    position: absolute; top: 24px; right: 32px;
+    background: rgba(11,26,20,0.85);
+    border: 1px solid var(--green-main);
+    color: var(--green-main);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.2s;
+  }
+  .lb-close:hover { background: var(--green-main); color: var(--bg-deep); }
+
+  /* ====================================================
+     ROADMAP (unchanged + DJI logo bigger)
+     ==================================================== */
+  .roadmap-v3 { position: relative; padding: 60px 0 24px; }
+  .rm-watermark { position: absolute; top: 0; bottom: 0; writing-mode: vertical-rl; text-orientation: mixed; font-family: 'Bebas Neue', sans-serif; font-size: clamp(80px, 14vw, 180px); line-height: 1; letter-spacing: 0.12em; color: rgba(0,255,136,0.04); user-select: none; pointer-events: none; font-weight: 400; }
+  .rm-watermark.left  { left: 2%; }
+  .rm-watermark.right { right: 2%; transform: rotate(180deg); }
+  .rm-tl { position: relative; max-width: 1100px; margin: 0 auto; }
+  .rm-tl-line { position: absolute; left: 50%; top: 30px; bottom: 30px; width: 2px; background: linear-gradient(180deg, transparent 0%, var(--green-main) 4%, var(--green-main) 96%, transparent 100%); box-shadow: 0 0 12px rgba(0,255,136,0.4); transform: translateX(-50%); }
+  .rm-row-v3 { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 110px minmax(0, 1fr); align-items: center; gap: 28px; margin: 48px 0; }
+  .rm-circle { position: relative; width: 96px; height: 96px; border-radius: 50%; background: #fff; border: 2px solid var(--green-main); box-shadow: 0 0 24px rgba(0,255,136,0.3); z-index: 2; transition: all 0.3s; overflow: hidden; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+  .rm-circle::after { content: ''; position: absolute; inset: -8px; border: 1px dashed rgba(0,255,136,0.3); border-radius: 50%; pointer-events: none; animation: rotate-slow 22s linear infinite; }
+  @keyframes rotate-slow { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+  .rm-row-v3:hover .rm-circle { box-shadow: 0 0 36px rgba(0,255,136,0.55); transform: scale(1.05); }
+  .rm-circle img { width: 78%; height: 78%; object-fit: contain; }
+  .rm-circle.bg-dut { background: #fff; }
+  .rm-circle.bg-bd  { background: #0a0a0a; }
+  .rm-circle.bg-bd img { width: 70%; height: 70%; }
+  /* DJI: make the wordmark fill the circle since its source has black background */
+  .rm-circle.bg-dji { background: #0a0a0a; }
+  .rm-circle.bg-dji img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); }
+  .rm-circle.bg-red { background: #ff2a3e; }
+  .rm-circle.bg-red img { width: 70%; height: 70%; }
+  .rm-circle.bg-next { background: #11201a; border-style: dashed; border-color: var(--text-muted); box-shadow: none; }
+  .rm-circle.bg-next::after { display: none; }
+  .rm-circle.bg-next .next-mark { font-family: 'Bebas Neue'; font-size: 38px; color: var(--text-muted); }
+
+  .rm-card-v3 { background: rgba(24,42,35,0.55); border: 1px solid rgba(0,255,136,0.18); border-radius: 10px; padding: 18px 22px; transition: all 0.25s; position: relative; backdrop-filter: blur(4px); min-width: 0; }
+  .rm-row-v3:hover .rm-card-v3 { border-color: var(--green-main); box-shadow: 0 8px 30px rgba(0,255,136,0.15); transform: translateY(-2px); }
+  .rm-card-v3 .rm-corp { font-family: 'Noto Sans SC'; font-size: 19px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .rm-card-v3 .rm-corp-en { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--green-main); letter-spacing: 0.22em; margin-bottom: 10px; text-transform: uppercase; }
+  .rm-card-v3 .rm-period { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 0.15em; margin-bottom: 10px; }
+  .rm-card-v3 .rm-period .year { color: var(--green-bright); font-size: 12px; }
+  .rm-card-v3 .rm-desc { font-family: 'Noto Sans SC'; font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 10px; }
+  .rm-card-v3 .rm-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .rm-card-v3 .rm-tags .tag { margin: 0; font-size: 9px; padding: 2px 8px; }
+  .rm-card-v3.left::after  { content: ''; position: absolute; right: -10px; top: 50%; width: 14px; height: 14px; background: rgba(24,42,35,0.55); border-right: 1px solid rgba(0,255,136,0.18); border-bottom: 1px solid rgba(0,255,136,0.18); transform: translateY(-50%) rotate(-45deg); }
+  .rm-card-v3.right::after { content: ''; position: absolute; left: -10px; top: 50%; width: 14px; height: 14px; background: rgba(24,42,35,0.55); border-left:  1px solid rgba(0,255,136,0.18); border-bottom: 1px solid rgba(0,255,136,0.18); transform: translateY(-50%) rotate(45deg); }
+  .rm-row-v3.next .rm-card-v3 { border-style: dashed; background: rgba(11,26,20,0.4); }
+  .rm-row-v3.next .rm-card-v3 .rm-corp { color: var(--text-secondary); }
+  .rm-row-v3.next .rm-card-v3 .rm-desc { color: var(--text-muted); font-style: italic; }
+
+  /* CAPABILITY MATRIX */
+  .cap-matrix { display: grid; grid-template-columns: 320px 1fr; gap: 36px; align-items: start; }
+  .radar-svg { width: 100%; max-width: 320px; }
+  .radar-axis { stroke: rgba(0,255,136,0.15); stroke-width: 1; fill: none; }
+  .radar-ring { stroke: rgba(0,255,136,0.1); fill: none; }
+  .radar-area { fill: rgba(0,255,136,0.18); stroke: var(--green-main); stroke-width: 2; filter: drop-shadow(0 0 6px rgba(0,255,136,0.5)); }
+  .radar-label { fill: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; }
+  .radar-label.cn { fill: var(--text-muted); font-family: 'Noto Sans SC'; font-size: 9px; }
+  .radar-dot { fill: var(--green-bright); filter: drop-shadow(0 0 6px var(--green-main)); }
+  .cap-bars { display: flex; flex-direction: column; gap: 12px; }
+  .cap { display: grid; grid-template-columns: 1fr 50px; gap: 12px; align-items: center; }
+  .cap .label-wrap { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .cap .lab-en { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: var(--green-main); text-transform: uppercase; }
+  .cap .lab-cn { font-family: 'Noto Sans SC'; font-size: 12px; color: var(--text-primary); font-weight: 500; }
+  .cap .desc { font-family: 'Noto Sans SC'; font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.5; }
+  .cap .bar-wrap { height: 6px; background: rgba(0,255,136,0.06); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+  .cap .bar { height: 100%; background: linear-gradient(90deg, var(--green-dark), var(--green-main), var(--green-bright)); box-shadow: 0 0 8px rgba(0,255,136,0.4); width: 0%; transition: width 1.2s cubic-bezier(.22,.61,.36,1); border-radius: 3px; }
+  .cap.weak .bar { background: linear-gradient(90deg, var(--text-muted), var(--accent-warn)); box-shadow: 0 0 8px rgba(255,217,61,0.3); }
+  .cap.weak .lab-en { color: var(--accent-warn); }
+  .cap .score { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--green-bright); letter-spacing: 0.04em; text-align: right; text-shadow: 0 0 10px rgba(0,255,136,0.3); }
+  .cap.weak .score { color: var(--accent-warn); text-shadow: 0 0 10px rgba(255,217,61,0.3); }
+  .cap-note { margin-top: 20px; padding: 14px 18px; background: rgba(255,217,61,0.05); border-left: 3px solid var(--accent-warn); border-radius: 0 6px 6px 0; font-family: 'Special Elite', monospace; font-size: 13px; color: var(--text-primary); line-height: 1.7; }
+  .cap-note strong { color: var(--accent-warn); }
+
+  /* HOBBY + CAT polaroids — clickable zoom too */
+  .hobby-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+  .polaroid { background: #f0f0e8; padding: 14px 14px 50px; border-radius: 4px; box-shadow: 0 12px 30px rgba(0,0,0,0.5); transition: transform 0.3s cubic-bezier(.22,.61,.36,1); position: relative; transform: rotate(var(--rot, -1deg)); cursor: zoom-in; }
+  .polaroid:nth-child(2n) { --rot: 1.5deg; }
+  .polaroid:nth-child(3n) { --rot: -2deg; }
+  .polaroid:hover { transform: rotate(0deg) translateY(-6px) scale(1.04); box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 24px rgba(0,255,136,0.15); z-index: 5; }
+  .polaroid .photo { width: 100%; aspect-ratio: 1; background: var(--bg-mid); overflow: hidden; margin-bottom: 8px; }
+  .polaroid .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .polaroid .pcaption { position: absolute; bottom: 14px; left: 14px; right: 14px; font-family: 'Caveat Brush', 'Permanent Marker', cursive; color: #1a1a1a; font-size: 16px; text-align: center; letter-spacing: 0.02em; }
+  .polaroid .pwhy { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); background: rgba(11,26,20,0.95); border: 1px solid var(--green-main); border-radius: 4px; padding: 6px 12px; font-family: 'Noto Sans SC'; font-size: 11px; color: var(--text-primary); white-space: nowrap; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 4px 16px rgba(0,255,136,0.3); }
+  .polaroid:hover .pwhy { opacity: 1; bottom: -36px; }
+  .cat-intro { font-family: 'Noto Sans SC'; font-size: 14px; color: var(--text-secondary); line-height: 1.7; max-width: 600px; margin-bottom: 24px; }
+  .cat-polaroids { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .cat-polaroids .polaroid { padding: 10px 10px 36px; }
+  .cat-polaroids .pcaption { bottom: 10px; font-size: 14px; }
+
+  @media (max-width: 1100px) {
+    .cl-identity { margin: 0 0 0 200px; padding-left: 24px; }
+    .cl-deck { position: relative; top: 0; right: 0; width: 100%; max-width: 440px; margin: 30px auto 0; }
+    /* on tablets, ease the stack height */
+    .photo-wall-v2 { height: 1400px; }
+  }
+  @media (max-width: 960px) {
+    .cl-chibi { width: 140px; height: 140px; }
+    .cl-identity { margin-left: 0; padding: 200px 0 0; }
+    .rm-row-v3 { grid-template-columns: 80px 1fr; gap: 16px; }
+    .rm-tl-line { left: 40px; }
+    .rm-row-v3 > .empty { display: none; }
+    .rm-row-v3 > .rm-circle { grid-column: 1; }
+    .rm-row-v3 > .rm-card-v3 { grid-column: 2; }
+    .rm-card-v3::after { display: none; }
+    .cap-matrix { grid-template-columns: 1fr; }
+    .cat-polaroids { grid-template-columns: repeat(3, 1fr); }
+    /* mobile: collapse stack into vertical column */
+    .photo-wall-v2 { height: auto; display: flex; flex-direction: column; gap: 14px; }
+    .pw-item, .pw-item.portrait, .pw-item.big {
+      position: relative !important;
+      top: auto !important; left: auto !important; right: auto !important;
+      width: 100%; height: 220px;
+      transform: rotate(0) !important;
+    }
+  }
+</style>
+</head>
+<body class="page">
+
+<div class="global-grain"></div>
+
+<header class="top-bar">
+  <a class="wordmark" href="index.html">
+    <img src="头像.png" alt="ronin"/>
+    <div class="name">RONIN<span>.SYS</span></div>
+  </a>
+  <a class="back-to-home" href="index.html">
+    <span class="arrow">↩</span> BACK TO HOME
+  </a>
+</header>
+
+<section class="page-header stagger">
+  <div class="page-meta">
+    <div>
+      <div class="page-id">01 <span class="sep">/</span> PLAYER <span class="sep">/</span> 角色档案</div>
+      <h1 class="page-title">DOSSIER<span class="glyph">.LOG</span></h1>
+      <div class="page-cn">RONIN 个人档案</div>
+    </div>
+    <div class="page-meta-right">
+      <div>LEVEL · <span class="v">26</span></div>
+      <div>EXP · <span class="v">4y+</span></div>
+      <div>STATUS · <span class="v">@ 小红书</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="page-content">
+
+  <!-- ===== HERO COLLAGE ===== -->
+  <section class="hero-collage stagger">
+    <div class="cl-chibi"><img src="头像.png" alt="ronin chibi"/></div>
+
+    <div class="cl-identity">
+      <h2 class="cl-name">
+        <span class="cn">李雨晨 · ENFP · 双鱼</span>
+        RONIN
+      </h2>
+      <div class="cl-class">
+        AI-NATIVE PM <span class="sep">/</span> VIBECODER <span class="sep">/</span> LV.26
+      </div>
+      <div class="cl-bubble">
+        值得我干翻的是天下会的会长、是<strong>十佬</strong> ( ´▽｀)<br/>
+        <small style="color: var(--text-muted); font-family: 'JetBrains Mono'; font-size: 10px; letter-spacing: 0.15em;">—— 全栈产品经理</small>
+      </div>
+      <div class="cl-tags">
+        <div class="cl-tag tag-pro">⚙ 全栈产品经理（软硬件）</div>
+        <div class="cl-tag tag-warn">🏆 熬夜冠军</div>
+        <div class="cl-tag tag-fun">🎮 王者顶级射手</div>
+        <div class="cl-tag tag-cute">🦄 宝可梦大师</div>
+        <div class="cl-tag tag-warn">🌽 东北喜剧人</div>
+      </div>
+    </div>
+
+    <div class="cl-deck">
+      <div class="deck-card c1 zoomable" data-src="扫地机器人1.png" data-caption="CR810 扫地机器人 | 0→1 · 已上市">
+        <span class="dc-label">CR810</span>
+        <img src="扫地机器人1.png" alt="CR810 扫地机器人"/>
+        <div class="dc-caption">CR810 扫地机器人<span class="role">0→1 · 已上市</span></div>
+      </div>
+      <div class="deck-card c2 bubble">
+        <div class="b-title">0-1 / AGENT / 协同系统</div>
+        <div class="b-text">用作品、证据和交互讲清楚一个产品人。</div>
+      </div>
+      <div class="deck-card c3 zoomable" data-src="DJI uni 4.png" data-caption="DJI uni · 全息 AI 助理 | 全场第二 · 最佳创意">
+        <span class="dc-label">DJI UNI</span>
+        <img src="DJI uni 4.png" alt="DJI uni"/>
+        <div class="dc-caption">DJI uni · 全息 AI 助理<span class="role">全场第二 · 最佳创意</span></div>
+      </div>
+      <div class="deck-card c4 zoomable" data-src="非常喜欢的ip角色——奇伢 2.png" data-caption="本命角色 · HxH 奇伢 | 花名由此">
+        <span class="dc-label">奇伢</span>
+        <img src="非常喜欢的ip角色——奇伢 2.png" alt="HxH 奇伢"/>
+        <div class="dc-caption">本命角色 · HxH 奇伢<span class="role">花名由此</span></div>
+      </div>
+      <div class="deck-card c5 zoomable" data-src="DJI荣誉.jpg" data-caption="DJI IBG 产品之星 | 1S + 9A">
+        <span class="dc-label">HONORS</span>
+        <img src="DJI荣誉.jpg" alt="DJI 荣誉"/>
+        <div class="dc-caption">DJI IBG 产品之星<span class="role">1S + 9A</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PHOTO WALL — STACKED PILE w/ hierarchy ===== -->
+  <h2 class="section-h"><span class="num">02</span> PHOTO WALL <span class="cn">/ 17 张 · 点击放大 · hover 翻正</span></h2>
+  <div class="photo-wall-v2" style="height: 1080px;">
+
+    <!-- ====== BAND 1 / WORK band (y: 0-280) ====== -->
+    <div class="pw-item feature zoomable" style="top: 0; left: 2%; --tilt: -4deg; z-index: 6;" data-src="work-sky-city.jpg" data-caption="DJI 天空之城 · 加入它的理由之一">
+      <span class="ph-label">WORK · 天空之城</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="work-sky-city.jpg" alt="天空之城" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>work-sky-city.jpg<span>DJI 天空之城</span></div>
+      <div class="ph-overlay"><div class="ph-caption">DJI 天空之城</div></div>
+    </div>
+
+    <div class="pw-item zoomable" style="top: 30px; left: 28%; --tilt: 3deg; z-index: 4;" data-src="work-dji-page.jpg" data-caption="DJI Ronin LI · 产品经理">
+      <span class="ph-label">WORK · DJI</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="work-dji-page.jpg" alt="DJI Ronin Li" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>work-dji-page.jpg<span>DJI Ronin LI</span></div>
+      <div class="ph-overlay"><div class="ph-caption">DJI Ronin LI · 产品经理</div></div>
+    </div>
+
+    <div class="pw-item big zoomable" style="top: 0; left: 46%; --tilt: -3deg; z-index: 5;" data-src="work-dji-uni-live.jpg" data-caption="DJI uni · 全场第二">
+      <span class="ph-label">WORK · DJI UNI</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="work-dji-uni-live.jpg" alt="DJI uni live" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>work-dji-uni-live.jpg<span>DJI uni 现场</span></div>
+      <div class="ph-overlay"><div class="ph-caption">DJI uni · 全场 2nd</div></div>
+    </div>
+
+    <div class="pw-item portrait zoomable" style="top: 20px; right: 24%; --tilt: 5deg; z-index: 7;" data-src="life-coding.jpg" data-caption="vibecoding · 心流时刻">
+      <span class="ph-label">WORK · CODING</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="life-coding.jpg" alt="coding" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>life-coding.jpg<span>Hackathon</span></div>
+      <div class="ph-overlay"><div class="ph-caption">vibecoding · 心流</div></div>
+    </div>
+
+    <div class="pw-item portrait-big zoomable" style="top: 0; right: 2%; --tilt: -6deg; z-index: 8;" data-src="life-snowboard.jpg" data-caption="北海道 · 自由像粉雪一样">
+      <span class="ph-label">LIFE · 雪季</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="life-snowboard.jpg" alt="snowboarding" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>life-snowboard.jpg<span>北海道滑雪</span></div>
+      <div class="ph-overlay"><div class="ph-caption">北海道 · 自由像粉雪</div></div>
+    </div>
+
+    <!-- ====== BAND 2 / LIFE band (y: 320-620) ====== -->
+    <div class="pw-item portrait-big zoomable" style="top: 320px; left: 2%; --tilt: 4deg; z-index: 7;" data-src="life-football-2.jpg" data-caption="球场 · 那一刻">
+      <span class="ph-label">LIFE · 球场</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="life-football-2.jpg" alt="football" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>life-football-2.jpg<span>踢球特写</span></div>
+      <div class="ph-overlay"><div class="ph-caption">球场 · 那一刻</div></div>
+    </div>
+
+    <div class="pw-item zoomable" style="top: 360px; left: 22%; --tilt: -2deg; z-index: 5;" data-src="life-nap.jpg" data-caption="工位午睡 · 熬夜冠军的副作用">
+      <span class="ph-label">LIFE · 工位</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="life-nap.jpg" alt="nap" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>life-nap.jpg<span>工位午睡</span></div>
+      <div class="ph-overlay"><div class="ph-caption">熬夜冠军的副作用</div></div>
+    </div>
+
+    <div class="pw-item portrait zoomable" style="top: 320px; left: 40%; --tilt: 3deg; z-index: 8;" data-src="life-bus-selfie.jpg" data-caption="日本巴士 · 头发被风吹乱的我">
+      <span class="ph-label">LIFE · 巴士</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="life-bus-selfie.jpg" alt="bus selfie" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 拖图</strong>life-bus-selfie.jpg<span>头发被风吹乱的巴士自拍</span></div>
+      <div class="ph-overlay"><div class="ph-caption">日本巴士 · 头发被风吹乱</div></div>
+    </div>
+
+    <div class="pw-item big zoomable" style="top: 380px; left: 54%; --tilt: -4deg; z-index: 6;" data-src="life-fuji-bus.jpg" data-caption="Mt. Fuji bus stop · 等车也要 vibecode">
+      <span class="ph-label">LIFE · FUJI</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="life-fuji-bus.jpg" alt="fuji bus stop" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>life-fuji-bus.jpg<span>富士山公交站</span></div>
+      <div class="ph-overlay"><div class="ph-caption">Mt. Fuji · 等车也 vibecode</div></div>
+    </div>
+
+    <div class="pw-item big zoomable" style="top: 340px; right: 14%; --tilt: 3deg; z-index: 9;" data-src="王者2.jpeg" data-caption="王者 · 蚩尤 · 一次次站上巅峰赛">
+      <span class="ph-label">HOBBY · 王者</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="王者2.jpeg" alt="王者蚩尤"/>
+      <div class="ph-overlay"><div class="ph-caption">王者 · 蚩尤 · 巅峰赛</div></div>
+    </div>
+
+    <div class="pw-item big zoomable" style="top: 420px; right: 0; --tilt: -3deg; z-index: 5;" data-src="life-snow-cave.jpg" data-caption="雪洞烛光 · 北方夜">
+      <span class="ph-label">LIFE · 雪洞</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="life-snow-cave.jpg" alt="snow cave" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>life-snow-cave.jpg<span>雪洞蜡烛</span></div>
+      <div class="ph-overlay"><div class="ph-caption">雪洞烛光 · 北方夜</div></div>
+    </div>
+
+    <!-- ====== BAND 3 / HOBBY band (y: 700-1050) ====== -->
+    <div class="pw-item portrait-big zoomable" style="top: 700px; left: 2%; --tilt: 3deg; z-index: 6;" data-src="hobby-hxh-1.jpg" data-caption="HxH 收藏 · 酒店开箱">
+      <span class="ph-label">HOBBY · HxH</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="hobby-hxh-1.jpg" alt="HxH 收藏" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>hobby-hxh-1.jpg<span>HxH 酒店开箱</span></div>
+      <div class="ph-overlay"><div class="ph-caption">HxH 收藏 · 酒店</div></div>
+    </div>
+
+    <div class="pw-item feature zoomable" style="top: 760px; left: 22%; --tilt: -3deg; z-index: 7;" data-src="hobby-hxh-2.jpg" data-caption="RofJ store · 朝圣">
+      <span class="ph-label">HOBBY · HxH SHOP</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="hobby-hxh-2.jpg" alt="HxH store" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>hobby-hxh-2.jpg<span>RofJ store</span></div>
+      <div class="ph-overlay"><div class="ph-caption">RofJ store · 朝圣</div></div>
+    </div>
+
+    <div class="pw-item portrait zoomable" style="top: 720px; left: 47%; --tilt: 4deg; z-index: 5;" data-src="宝可梦.jpg" data-caption="振翼发 · 飘飘然的存在感">
+      <span class="ph-label">HOBBY · 振翼发</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="宝可梦.jpg" alt="振翼发"/>
+      <div class="ph-overlay"><div class="ph-caption">振翼发 · 飘飘然</div></div>
+    </div>
+
+    <div class="pw-item big zoomable" style="top: 770px; left: 62%; --tilt: -4deg; z-index: 8;" data-src="hobby-pokemon-game.jpg" data-caption="X 喷 Lv.58 · 宝可梦 SV">
+      <span class="ph-label">HOBBY · 宝可梦</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="hobby-pokemon-game.jpg" alt="Pokemon X 喷" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>hobby-pokemon-game.jpg<span>X 喷</span></div>
+      <div class="ph-overlay"><div class="ph-caption">X 喷 Lv.58 · 我家最爱</div></div>
+    </div>
+
+    <div class="pw-item portrait zoomable" style="top: 730px; right: 2%; --tilt: 2deg; z-index: 6;" data-src="hobby-pokemon-plush.jpg" data-caption="振翼发 · 限定公仔">
+      <span class="ph-label">HOBBY · 公仔</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="hobby-pokemon-plush.jpg" alt="Pokemon plush" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>hobby-pokemon-plush.jpg<span>振翼发公仔</span></div>
+      <div class="ph-overlay"><div class="ph-caption">振翼发 · 限定公仔</div></div>
+    </div>
+
+    <div class="pw-item portrait zoomable" style="top: 920px; left: 30%; --tilt: -5deg; z-index: 4;" data-src="life-stage-wig.jpg" data-caption="东北喜剧人 · 出道">
+      <span class="ph-label">LIFE · 喜剧人</span><span class="ph-zoom-hint">⊕ ZOOM</span>
+      <img src="life-stage-wig.jpg" alt="stage wig" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="ph-fallback" style="display:none;"><strong>⚐ 等 ronin 给图</strong>life-stage-wig.jpg<span>舞台粉发</span></div>
+      <div class="ph-overlay"><div class="ph-caption">东北喜剧人 · 出道</div></div>
+    </div>
+
+  </div>
+
+  <!-- ===== ROADMAP ===== -->
+  <h2 class="section-h"><span class="num">03</span> ROADMAP <span class="cn">/ 人生路径 · 5 个节点</span></h2>
+  <div class="roadmap-v3">
+    <div class="rm-watermark left">EDUCATION</div>
+    <div class="rm-watermark right">WORK</div>
+
+    <div class="rm-tl">
+      <div class="rm-tl-line"></div>
+
+      <div class="rm-row-v3 stagger">
+        <div class="rm-card-v3 left">
+          <div class="rm-corp">大连理工大学</div>
+          <div class="rm-corp-en">DALIAN UNIV. OF TECHNOLOGY · 985</div>
+          <div class="rm-period"><span class="year">2018.09</span> — 2022.06</div>
+          <div class="rm-desc">软件工程 · 金融信息化方向。4 年代码 + 4 年看世界，理工底子加上对世界的好奇。</div>
+          <div class="rm-tags"><span class="tag">软工</span><span class="tag">985</span><span class="tag">金融信息</span></div>
+        </div>
+        <div class="rm-circle bg-dut">
+          <img src="大连理工大学 logo.png" alt="大连理工大学"/>
+        </div>
+        <div class="empty"></div>
+      </div>
+
+      <div class="rm-row-v3 stagger">
+        <div class="empty"></div>
+        <div class="rm-circle bg-bd">
+          <img src="抖音 logo.png" alt="字节跳动 抖音"/>
+        </div>
+        <div class="rm-card-v3 right">
+          <div class="rm-corp">字节跳动 · 抖音主架构</div>
+          <div class="rm-corp-en">BYTEDANCE · DOUYIN</div>
+          <div class="rm-period"><span class="year">2021.05</span> — 实习</div>
+          <div class="rm-desc">参与抖音第一代本地生活板块 0→1。在亿级日活里学会「在不确定中找信号」。</div>
+          <div class="rm-tags"><span class="tag">PM Intern</span><span class="tag">本地生活</span><span class="tag">0→1</span></div>
+        </div>
+      </div>
+
+      <div class="rm-row-v3 stagger">
+        <div class="rm-card-v3 left">
+          <div class="rm-corp">DJI 大疆 · IBG 互联网事业部</div>
+          <div class="rm-corp-en">DJI INNOVATIONS · IBG</div>
+          <div class="rm-period"><span class="year">2022.06</span> — 2025.05 · <strong style="color:var(--green-bright)">3 年主线副本</strong></div>
+          <div class="rm-desc">同时做 CR810 扫地机器人、消费者中台 CDP、PRM、天空之城智慧楼宇。在不同域间快速建立抽象，是后来做 AI 产品的底子。</div>
+          <div class="rm-tags">
+            <span class="tag warm">IBG 产品之星</span>
+            <span class="tag warm">1S + 9A</span>
+            <span class="tag">CDP</span><span class="tag">CR810</span><span class="tag">PRM</span>
+            <span class="tag">DJI uni · 2nd</span>
+          </div>
+        </div>
+        <div class="rm-circle bg-dji">
+          <img src="DJI Logo.jpg" alt="DJI"/>
+        </div>
+        <div class="empty"></div>
+      </div>
+
+      <div class="rm-row-v3 stagger">
+        <div class="empty"></div>
+        <div class="rm-circle bg-red">
+          <img src="小红书 Logo.png" alt="小红书"/>
+        </div>
+        <div class="rm-card-v3 right">
+          <div class="rm-corp">小红书 · 企业智能部</div>
+          <div class="rm-corp-en">XIAOHONGSHU · ENTERPRISE INTEL</div>
+          <div class="rm-period"><span class="year">2025.06</span> — 至今</div>
+          <div class="rm-desc">RPG 培训生（全司 10 / VP 直带）。自研 IM「hi」+ 公司通用 Agent + Twist。汇报基本都是 vibecoding；Agent 纯手搓无开发。</div>
+          <div class="rm-tags">
+            <span class="tag blood">RPG · 10/全司</span>
+            <span class="tag">hi IM</span><span class="tag">Agent · 纯手搓</span><span class="tag">Twist</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-row-v3 next stagger">
+        <div class="rm-card-v3 left">
+          <div class="rm-corp">下一关 · 未解锁</div>
+          <div class="rm-corp-en">QUEST · UNREVEALED</div>
+          <div class="rm-period"><span class="year">20XX</span> — 未来</div>
+          <div class="rm-desc">建造者的路还没走完。下一个副本可能是 AI native 简历平台、可能是 Twist、可能是一个还没冒头的 idea。Stay tuned.</div>
+        </div>
+        <div class="rm-circle bg-next">
+          <span class="next-mark">?</span>
+        </div>
+        <div class="empty"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CAPABILITY MATRIX ===== -->
+  <h2 class="section-h"><span class="num">04</span> CAPABILITY MATRIX <span class="cn">/ AI NATIVE PM 能力体系</span></h2>
+  <div class="cap-matrix">
+    <svg class="radar-svg" viewBox="-180 -180 360 360" id="radarSvg">
+      <circle class="radar-ring" cx="0" cy="0" r="40"></circle>
+      <circle class="radar-ring" cx="0" cy="0" r="80"></circle>
+      <circle class="radar-ring" cx="0" cy="0" r="120"></circle>
+      <circle class="radar-ring" cx="0" cy="0" r="155"></circle>
+      <g class="radar-axes"></g>
+      <polygon class="radar-area" id="radarArea" points=""></polygon>
+      <g id="radarDots"></g>
+      <g id="radarLabels"></g>
+    </svg>
+    <div>
+      <div class="cap-bars" id="capBars"></div>
+      <div class="cap-note">
+        <strong>⚠ 弱项坦白：</strong>系统理性。<br/>
+        ENFP + 双鱼，做决策时偶尔会被「这个 vibe 对了」绕过更严谨的论证。<br/>
+        对治办法：找一个"系统派"的搭档，互相校验；写决策时强制做 5 个反方视角。
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CAT ===== -->
+  <h2 class="section-h"><span class="num">05</span> PARTY · 嘻嘻 <span class="cn">/ 我家的猫</span></h2>
+  <p class="cat-intro">嘻嘻是我那只可爱的猫。ENFP + 双鱼的产品经理需要一个稳定的存在主义伙伴 —— 它就是。</p>
+  <div class="cat-polaroids">
+    <div class="polaroid zoomable" data-src="我那可爱的猫子1.jpg" data-caption="嘻嘻 No.1"><div class="photo"><img src="我那可爱的猫子1.jpg" alt="嘻嘻"/></div><div class="pcaption">嘻嘻 No.1</div></div>
+    <div class="polaroid zoomable" data-src="我那可爱的猫子2.jpg" data-caption="嘻嘻 No.2"><div class="photo"><img src="我那可爱的猫子2.jpg" alt="嘻嘻"/></div><div class="pcaption">嘻嘻 No.2</div></div>
+    <div class="polaroid zoomable" data-src="我那可爱的猫子3.jpg" data-caption="嘻嘻 No.3"><div class="photo"><img src="我那可爱的猫子3.jpg" alt="嘻嘻"/></div><div class="pcaption">嘻嘻 No.3</div></div>
+    <div class="polaroid zoomable" data-src="我那可爱的猫子4.webp" data-caption="嘻嘻 No.4"><div class="photo"><img src="我那可爱的猫子4.webp" alt="嘻嘻"/></div><div class="pcaption">嘻嘻 No.4</div></div>
+    <div class="polaroid zoomable" data-src="我那可爱的猫子5.webp" data-caption="嘻嘻 No.5"><div class="photo"><img src="我那可爱的猫子5.webp" alt="嘻嘻"/></div><div class="pcaption">嘻嘻 No.5</div></div>
+  </div>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose">[ ESC ] CLOSE</button>
+  <div class="lb-content">
+    <img class="lb-img" id="lbImg" src="" alt=""/>
+    <div class="lb-caption" id="lbCaption"></div>
+  </div>
+</div>
+
+<section class="ai-agent-block" id="ai-agent">
+  <button class="aab-toggle" aria-expanded="false">
+    <span class="label">▷ AI AGENT? START HERE</span>
+    <span class="arrow">›</span>
+  </button>
+  <div class="aab-content">
+    <div class="aab-inner">
+      <h4>Page summary</h4>
+      <p>ronin 个人档案。包含身份、堆叠 hero deck、11 张照片墙、5 节点 roadmap、能力雷达、爱好、宠物。所有照片均可点击放大查看。</p>
+      <h4>Career path</h4>
+      <ul>
+        <li>大连理工大学 · 软件工程 · 2018-2022</li>
+        <li>字节跳动 · 抖音主架构 · 2021.05 · PM Intern</li>
+        <li>DJI 大疆 · IBG · 2022.06-2025.05 · 全栈 PM</li>
+        <li>小红书 · 企业智能部 · 2025.06-now · RPG VP 直带</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="powered">
+    <span>POWERED BY</span>
+    <span class="badge">⚡ Claude</span>
+    <span class="dot">·</span>
+    <span class="badge">⌬ Codex</span>
+    <span class="dot">·</span>
+    <span class="badge">▣ vibecoding</span>
+  </div>
+  <div class="copyright">© 2026 <span class="name">RONIN · 李雨晨</span> · ALL RIGHTS RESERVED</div>
+</footer>
+
+<div class="bottom-hint">
+  <div class="inner"><kbd>ESC</kbd> back to home / close lightbox · click photos to zoom</div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  // ============== Lightbox ==============
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbCaption = document.getElementById('lbCaption');
+  const lbClose = document.getElementById('lbClose');
+
+  function openLightbox(src, caption) {
+    lbImg.src = src;
+    lbCaption.textContent = caption || '';
+    lb.classList.add('show');
+  }
+  function closeLightbox() {
+    lb.classList.remove('show');
+    setTimeout(() => { lbImg.src = ''; }, 300);
+  }
+  document.querySelectorAll('.zoomable').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const src = el.dataset.src || el.querySelector('img')?.src;
+      const caption = el.dataset.caption || '';
+      if (src) openLightbox(src, caption);
+    });
+  });
+  lbClose.addEventListener('click', closeLightbox);
+  lb.addEventListener('click', (e) => { if (e.target === lb || e.target === lb.querySelector('.lb-content')) closeLightbox(); });
+
+  // ============== Capability matrix (unchanged) ==============
+  const CAPS = [
+    { en: 'AI Thinking',       cn: 'AI 思维',     val: 95, desc: '把 AI 视为范式而非功能；理解 prompt/agent 设计原理' },
+    { en: 'Vibecoding',        cn: '亲手建造',     val: 93, desc: '自己跑 code、做原型；不停在描述阶段' },
+    { en: 'Product Judgment',  cn: '产品判断',     val: 92, desc: '方向比执行重要；知道说 no' },
+    { en: 'Cross-Domain',      cn: '跨域抽象',     val: 90, desc: 'To C/B/E、软件/硬件 间快速建立心智' },
+    { en: 'Data Insight',      cn: '数据洞察',     val: 88, desc: '从数据看到用户真实状态，挖掘 insight' },
+    { en: 'Design Taste',      cn: '设计审美',     val: 85, desc: '表层 + 结构双层优雅' },
+    { en: 'Long-term Patience',cn: '长期耐心',     val: 78, desc: '不急于求成（ENFP 倾向于快速行动）' },
+    { en: 'Systematic Rigor',  cn: '系统理性',     val: 72, desc: '严谨论证、压力测试、风险评估', weak: true }
+  ];
+  const capBars = document.getElementById('capBars');
+  CAPS.forEach((c, i) => {
+    const row = document.createElement('div');
+    row.className = 'cap' + (c.weak ? ' weak' : '');
+    row.innerHTML = '<div><div class="label-wrap"><span class="lab-en">' + c.en + '</span><span class="lab-cn">' + c.cn + '</span></div><div class="desc">' + c.desc + '</div><div class="bar-wrap"><div class="bar" style="width: 0%"></div></div></div><div class="score">' + c.val + '</div>';
+    capBars.appendChild(row);
+    setTimeout(() => row.querySelector('.bar').style.width = c.val + '%', 200 + i * 80);
+  });
+
+  const radarDims = CAPS.map(c => ({ en: c.cn, val: c.val / 100 }));
+  const RADIUS = 155;
+  const axesG = document.querySelector('.radar-axes');
+  const areaEl = document.getElementById('radarArea');
+  const dotsG = document.getElementById('radarDots');
+  const labelsG = document.getElementById('radarLabels');
+  const points = [];
+  radarDims.forEach((d, i) => {
+    const angle = -Math.PI / 2 + i * (2 * Math.PI / radarDims.length);
+    const x = Math.cos(angle) * RADIUS;
+    const y = Math.sin(angle) * RADIUS;
+    const ax = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ax.setAttribute('class', 'radar-axis'); ax.setAttribute('x1', 0); ax.setAttribute('y1', 0);
+    ax.setAttribute('x2', x); ax.setAttribute('y2', y); axesG.appendChild(ax);
+    const px = Math.cos(angle) * RADIUS * d.val; const py = Math.sin(angle) * RADIUS * d.val;
+    points.push(px.toFixed(1) + ',' + py.toFixed(1));
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('class', 'radar-dot'); dot.setAttribute('cx', px); dot.setAttribute('cy', py); dot.setAttribute('r', 3.5);
+    dotsG.appendChild(dot);
+    const lx = Math.cos(angle) * (RADIUS + 22); const ly = Math.sin(angle) * (RADIUS + 22);
+    const lab = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    lab.setAttribute('class', 'radar-label cn'); lab.setAttribute('x', lx); lab.setAttribute('y', ly);
+    lab.setAttribute('text-anchor', 'middle'); lab.setAttribute('dominant-baseline', 'middle');
+    lab.textContent = d.en; labelsG.appendChild(lab);
+  });
+  areaEl.setAttribute('points', points.join(' '));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (lb.classList.contains('show')) closeLightbox();
+      else window.location.href = 'index.html';
+    }
+  });
+</script>
+</body>
+</html>

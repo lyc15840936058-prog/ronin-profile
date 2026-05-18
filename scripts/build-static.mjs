@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -13,6 +13,7 @@ const publicExtensions = new Set([
   '.jpg',
   '.jpeg',
   '.webp',
+  '.avif',
   '.gif',
   '.svg',
   '.ico',
@@ -81,8 +82,21 @@ for (const relative of trackedFiles()) {
 
   const target = path.join(outDir, relative);
   mkdirSync(path.dirname(target), { recursive: true });
-  cpSync(source, target);
+  if (path.extname(relative).toLowerCase() === '.html') {
+    writeFileSync(target, optimizeHtml(readFileSync(source, 'utf8')));
+  } else {
+    cpSync(source, target);
+  }
   console.log(`copied ${relative}`);
 }
 
 console.log(`Static site built at ${path.relative(root, outDir)}`);
+
+function optimizeHtml(html) {
+  return html.replace(/<img\b(?![^>]*\bloading=)([^>]*)>/gi, (match, attrs) => {
+    if (/\bfetchpriority=["']high["']/i.test(attrs) || /\bclass=["'][^"']*\blb-img\b/i.test(attrs)) {
+      return match;
+    }
+    return `<img loading="lazy" decoding="async"${attrs}>`;
+  });
+}

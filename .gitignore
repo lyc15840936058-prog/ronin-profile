@@ -19,6 +19,7 @@ node_modules
 # Build artifacts
 .next
 dist
+.playwright-cli
 
 # Working / scratch files we don't want in the repo
 mockup-hero-v*.html
@@ -39,7 +40,24 @@ Ronin试用期答辩 v2.0.pptx
 人物_cutout.png
 人物去背景.png
 人物.png
+人物_clean.png
+头像.png
 背景.png
+扫地机器人1.png
+扫地机器人2.png
+twist介绍.png
+twist-ui-2.png
+twist-ui-3.png
+twist-ui-4.png
+work-trophy.jpg
+life-football-2.jpg
+life-bus-selfie.jpg
+hobby-hxh-1.jpg
+hobby-hxh-2.jpg
+DJI uni 4.png
+dji-uni-capability.png
+dji-uni-product.png
+非常喜欢的ip角色——奇伢 2.png
 首页游戏风格人物图.png
 首页游戏风格参考.png
 loading1.png

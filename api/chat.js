@@ -1,6 +1,6 @@
 // Vercel serverless function: /api/chat
-// Proxies user message to Anthropic Claude using ronin's persona prompt.
-// Required env var: ANTHROPIC_API_KEY
+// Proxies user message to OpenAI using ronin's persona prompt.
+// Required env var: OPENAI_API_KEY
 
 import fs from 'fs';
 import path from 'path';
@@ -70,9 +70,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured on server.' });
+    return res.status(500).json({ error: 'OPENAI_API_KEY not configured on server.' });
   }
 
   let body = req.body;
@@ -84,32 +84,40 @@ export default async function handler(req, res) {
   if (message.length > 2000) return res.status(400).json({ error: 'Message too long (max 2000 chars).' });
 
   try {
-    const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+    const openaiRes = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 1024,
-        system: loadSystemPrompt(),
-        messages: [{ role: 'user', content: message }],
+        model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+        instructions: loadSystemPrompt(),
+        input: message,
+        max_output_tokens: 900,
       }),
     });
 
-    if (!anthropicRes.ok) {
-      const errText = await anthropicRes.text();
-      console.error('Anthropic API error:', anthropicRes.status, errText);
-      return res.status(502).json({ error: `Anthropic API error (${anthropicRes.status})` });
+    if (!openaiRes.ok) {
+      const errText = await openaiRes.text();
+      console.error('OpenAI API error:', openaiRes.status, errText);
+      return res.status(502).json({ error: `OpenAI API error (${openaiRes.status})` });
     }
 
-    const data = await anthropicRes.json();
-    const reply = data?.content?.[0]?.text || '(空回复)';
+    const data = await openaiRes.json();
+    const reply = data?.output_text || extractOutputText(data) || '(空回复)';
     return res.status(200).json({ reply });
   } catch (err) {
     console.error('Chat handler error:', err);
     return res.status(500).json({ error: err.message || 'Internal error' });
   }
+}
+
+function extractOutputText(data) {
+  return data?.output
+    ?.flatMap(item => item?.content || [])
+    ?.map(part => part?.text || '')
+    ?.filter(Boolean)
+    ?.join('\n')
+    ?.trim();
 }

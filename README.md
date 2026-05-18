@@ -20,8 +20,8 @@
 ## 技术栈
 
 - **前端**：纯 HTML/CSS/JS，无框架。Tailwind ?  Nah —— 全手写 CSS。
-- **后端**：Vercel Serverless Function (`/api/chat.js`)，调用 Anthropic Claude API
-- **LLM**：Claude Sonnet 4.5，system prompt 是 `奇伢理念2.md`（ronin 的 10 章产品哲学）
+- **后端**：Vercel Serverless Function (`/api/chat.js`)，调用 OpenAI Responses API
+- **LLM**：OpenAI `gpt-4o-mini`（可用 `OPENAI_MODEL` 覆盖），system prompt 是 `奇伢理念2.md`（ronin 的 10 章产品哲学）
 - **字体**：Bebas Neue · Permanent Marker · Smokum · Special Elite · JetBrains Mono · Noto Sans SC
 - **AI native 设计原则**：每页底部有 `▷ AI AGENT? START HERE` 折叠协议块；根目录有 `llms.txt`
 
@@ -41,13 +41,13 @@ vercel --prod
 ```
 
 **必须配置的环境变量**：
-- `ANTHROPIC_API_KEY` — ronin 自己的 Anthropic API key，用来跑 `/ronin-agent` 的真实 LLM 对话
+- `OPENAI_API_KEY` — ronin 自己的 OpenAI API key，用来跑 `/ronin-agent` 的真实 LLM 对话
 
 在 Vercel Dashboard → Settings → Environment Variables 添加。
 
 ## 致谢
 
-- Powered by **Claude** & **Codex** & **vibecoding native**
+- Powered by **OpenAI** & **Codex** & **vibecoding native**
 - 设计灵感：prodmaverick / bensweet / vitex-tech / pengwei-portfolio / clawpair / Resident Evil 9 主菜单
 - HTML/CSS/JS 全部由 ronin × Claude 在本机 vibecoding 出来
 

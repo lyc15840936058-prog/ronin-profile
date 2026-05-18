@@ -13,7 +13,7 @@
   .agent-wrap { display: grid; grid-template-columns: 1fr 380px; gap: 28px; margin-top: 24px; align-items: start; }
   .agent-card { background: linear-gradient(135deg, rgba(24,42,35,0.6), rgba(11,26,20,0.5)); border: 1px solid rgba(0,255,136,0.2); border-radius: 10px; overflow: hidden; height: 720px; display: flex; flex-direction: column; }
   .agent-header { padding: 18px 22px; background: linear-gradient(180deg, rgba(0,255,136,0.06), transparent); border-bottom: 1px solid rgba(0,255,136,0.15); display: flex; align-items: center; gap: 14px; }
-  .agent-avatar { width: 52px; height: 52px; border-radius: 50%; background: url("头像.png") center/cover; border: 2px solid var(--green-main); box-shadow: 0 0 18px rgba(0,255,136,0.3); position: relative; animation: subtle-breathe 4s ease-in-out infinite; flex-shrink: 0; }
+  .agent-avatar { width: 52px; height: 52px; border-radius: 50%; background: url("assets/avatar-160.avif") center/cover; border: 2px solid var(--green-main); box-shadow: 0 0 18px rgba(0,255,136,0.3); position: relative; animation: subtle-breathe 4s ease-in-out infinite; flex-shrink: 0; }
   @keyframes subtle-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
   .agent-avatar::after { content: ''; position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--green-bright); border-radius: 50%; border: 2px solid var(--bg-deep); box-shadow: 0 0 8px var(--green-main); animation: pulse-dot 1.5s ease-in-out infinite; }
   @keyframes pulse-dot { 0%,100% { box-shadow: 0 0 8px var(--green-main); } 50% { box-shadow: 0 0 16px var(--green-bright); } }
@@ -101,7 +101,7 @@
 
 <header class="top-bar">
   <a class="wordmark" href="index.html">
-    <img src="头像.png" alt="ronin"/>
+    <img src="assets/avatar-160.avif" alt="ronin"/>
     <div class="name">RONIN<span>.SYS</span></div>
   </a>
   <a class="back-to-home" href="index.html">
@@ -134,7 +134,7 @@
           <div class="name">RONIN <span>SOUL ECHO</span></div>
           <div class="status">● ONLINE · POWERED BY 理念 2.md</div>
         </div>
-        <div class="agent-mode-toggle" id="modeToggle" title="点击切换：DEMO 模式（关键词匹配）/ LIVE 模式（Anthropic Claude）">DEMO MODE</div>
+        <div class="agent-mode-toggle" id="modeToggle" title="点击切换：DEMO 模式（关键词匹配）/ LIVE 模式（OpenAI）">DEMO MODE</div>
       </div>
 
       <div class="msg-area" id="msgArea"></div>
@@ -171,15 +171,15 @@
 <div class="key-modal" id="keyModal">
   <div class="key-box">
     <h3>SWITCH TO LIVE MODE</h3>
-    <p>把你的 <strong style="color: var(--green-main)">Anthropic Claude API key</strong> 贴在这里，agent 就会接真 Claude，用 ronin 的理念 2.md 当 system prompt 回答你。</p>
-    <input type="password" id="apiKeyInput" placeholder="sk-ant-..." />
+    <p>把你的 <strong style="color: var(--green-main)">OpenAI API key</strong> 贴在 Vercel 环境变量里，agent 就会接真模型，用 ronin 的理念 2.md 当 system prompt 回答你。</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-..." />
     <div class="actions">
       <button class="secondary" id="cancelKey">取消</button>
       <button class="primary" id="saveKey">激活 LIVE</button>
     </div>
     <div class="note">
       ⚐ key 只存在你浏览器的 localStorage，不上传任何服务器。<br/>
-      ⚠ 直接浏览器调 Anthropic API 会因 CORS 失败。等 ronin 部署到 Vercel 后会走 /api/chat 代理。<br/>
+      ⚠ 直接浏览器调 OpenAI API 会因 CORS 和密钥安全失败。部署到 Vercel 后会走 /api/chat 代理。<br/>
       现在你贴 key 也只是激活 UI 状态，实际还是 DEMO MODE，等部署接通。
     </div>
   </div>
@@ -193,7 +193,7 @@
   <div class="aab-content">
     <div class="aab-inner">
       <h4>About this agent</h4>
-      <p>Fed with ronin's <code>奇伢理念 2.md</code> (10-chapter product philosophy) + his career history. Currently <code>DEMO MODE</code> — keyword matching; <code>LIVE</code> mode (Anthropic Claude) activates after Vercel deploy.</p>
+      <p>Fed with ronin's <code>奇伢理念 2.md</code> (10-chapter product philosophy) + his career history. Currently <code>DEMO MODE</code> — keyword matching; <code>LIVE</code> mode (OpenAI) activates after Vercel deploy.</p>
       <h4>What you can ask</h4>
       <ul>
         <li>Product judgment / AI product design philosophy</li>
@@ -208,7 +208,7 @@
 <footer class="site-footer">
   <div class="powered">
     <span>POWERED BY</span>
-    <span class="badge">⚡ Claude</span>
+    <span class="badge">⚡ OpenAI</span>
     <span class="dot">·</span>
     <span class="badge">⌬ Codex</span>
     <span class="dot">·</span>
@@ -319,7 +319,7 @@
     }
   ];
 
-  const FALLBACK = '嗯，这个问题我现在的 demo 大脑没法准确回答（关键词没匹中）。\n\n等部署到 Vercel 接上真 LLM（Anthropic Claude），我就能展开聊了。\n\n你可以换个角度问，或者点右边的弹幕，那些都是我能 cover 的话题。';
+  const FALLBACK = '嗯，这个问题我现在的 demo 大脑没法准确回答（关键词没匹中）。\n\n等部署到 Vercel 接上真 LLM（OpenAI），我就能展开聊了。\n\n你可以换个角度问，或者点右边的弹幕，那些都是我能 cover 的话题。';
 
   const msgArea = document.getElementById('msgArea');
   const userInput = document.getElementById('userInput');
@@ -419,11 +419,11 @@
   // Auto-update mode indicator based on detected status
   function updateMode() {
     if (LIVE_STATUS === 'live') {
-      modeToggle.textContent = '● LIVE · CLAUDE';
+      modeToggle.textContent = '● LIVE · OPENAI';
       modeToggle.classList.add('real');
       modeToggle.style.cursor = 'default';
-      modeToggle.title = '已接入 Anthropic Claude · server-managed API key';
-      hdrBackend.textContent = 'CLAUDE SONNET 4.5';
+      modeToggle.title = '已接入 OpenAI · server-managed API key';
+      hdrBackend.textContent = 'OPENAI';
     } else if (LIVE_STATUS === 'demo') {
       modeToggle.textContent = 'DEMO MODE';
       modeToggle.classList.remove('real');
@@ -446,7 +446,7 @@
   });
   document.getElementById('saveKey').addEventListener('click', () => {
     keyModal.classList.remove('show');
-    addMsg('部署到 Vercel 时把 ANTHROPIC_API_KEY 配在环境变量里，刷新页面后这里会自动切到 LIVE。本地浏览器直接调 anthropic.com 受 CORS 限制不可行。', 'agent');
+    addMsg('部署到 Vercel 时把 OPENAI_API_KEY 配在环境变量里，刷新页面后这里会自动切到 LIVE。本地浏览器直接调 api.openai.com 受 CORS 和密钥安全限制不可行。', 'agent');
   });
   document.getElementById('cancelKey').addEventListener('click', () => keyModal.classList.remove('show'));
 

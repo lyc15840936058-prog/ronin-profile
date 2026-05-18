@@ -7,6 +7,15 @@
 <meta name="description" content="ronin / 李雨晨 的个人简历。一个 ENFP 产品经理的源代码 —— 用作品本身证明 AI native。" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  rel="preload"
+  as="image"
+  href="assets/hero-bg-1280.avif"
+  imagesrcset="assets/hero-bg-960.avif 960w, assets/hero-bg-1280.avif 1280w, assets/hero-bg-1672.avif 1672w"
+  imagesizes="100vw"
+  type="image/avif"
+  fetchpriority="high"
+>
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
 <style>
@@ -115,7 +124,7 @@
     width: 180px; height: 180px;
     border-radius: 50%;
     background: var(--bg-mid);
-    background-image: url("头像.png");
+    background-image: url("assets/avatar-160.avif");
     background-size: cover;
     background-position: center;
     box-shadow: 0 0 40px rgba(0,255,136,0.4), inset 0 0 0 2px var(--green-main);
@@ -136,10 +145,16 @@
 
   .layer-bg {
     position: absolute; inset: -2%;
-    background-image: url("背景.png"); background-size: cover; background-position: center;
     filter: brightness(0.62) contrast(1.08) saturate(0.85);
     animation: breath-bg 4.5s ease-in-out infinite;
     will-change: transform; transform-origin: 50% 50%; z-index: 1;
+  }
+  .layer-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
   }
   .layer-haze {
     position: absolute; inset: -5%;
@@ -155,14 +170,22 @@
   }
   .layer-char {
     position: absolute; inset: 0;
-    background-image: url("人物_clean.png"); background-size: auto 76%;
+    background-image: image-set(
+      url("assets/hero-character.avif") type("image/avif"),
+      url("assets/hero-character-1280.png") type("image/png")
+    );
+    background-size: auto 76%;
     background-position: 90% bottom; background-repeat: no-repeat;
     /* DARKER — was 0.96 brightness, now 0.74; also dim saturate further */
     filter: drop-shadow(0 14px 30px rgba(0,0,0,0.6)) brightness(0.74) contrast(1.08) saturate(0.78);
   }
   .layer-hair {
     position: absolute; inset: 0;
-    background-image: url("人物_clean.png"); background-size: auto 76%;
+    background-image: image-set(
+      url("assets/hero-character.avif") type("image/avif"),
+      url("assets/hero-character-1280.png") type("image/png")
+    );
+    background-size: auto 76%;
     background-position: 90% bottom; background-repeat: no-repeat;
     -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 12%, rgba(0,0,0,0.5) 18%, transparent 24%);
     mask-image: linear-gradient(180deg, #000 0%, #000 12%, rgba(0,0,0,0.5) 18%, transparent 24%);
@@ -379,7 +402,19 @@
 
 <!-- ============== HERO SCENE ============== -->
 <div class="scene">
-  <div class="layer-bg"></div>
+  <picture class="layer-bg">
+    <source
+      type="image/avif"
+      srcset="assets/hero-bg-960.avif 960w, assets/hero-bg-1280.avif 1280w, assets/hero-bg-1672.avif 1672w"
+      sizes="100vw"
+    />
+    <source
+      type="image/jpeg"
+      srcset="assets/hero-bg-960.jpg 960w, assets/hero-bg-1280.jpg 1280w, assets/hero-bg-1672.jpg 1672w"
+      sizes="100vw"
+    />
+    <img src="assets/hero-bg-1280.jpg" alt="" fetchpriority="high" decoding="async" />
+  </picture>
   <div class="layer-haze"></div>
   <div class="char-stack">
     <div class="layer-char"></div>
@@ -397,7 +432,7 @@
 
   <header class="top-bar-hero">
     <a class="wordmark" href="index.html">
-      <img src="头像.png" alt="ronin"/>
+      <img src="assets/avatar-96.avif" alt="ronin" width="28" height="28" loading="eager" decoding="async" fetchpriority="high"/>
       <div class="name">RONIN<span>.SYS</span></div>
     </a>
     <div class="top-right">
@@ -464,7 +499,7 @@
     <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em; color: var(--text-muted); display: flex; gap: 14px; align-items: center;">
       <span>© 2026 <span style="color: var(--text-secondary);">RONIN · 李雨晨</span></span>
       <span style="color: var(--text-muted);">·</span>
-      <span>POWERED BY <strong style="color: var(--green-main); text-shadow: 0 0 6px rgba(0,255,136,0.4);">CLAUDE</strong> · <strong style="color: var(--green-main); text-shadow: 0 0 6px rgba(0,255,136,0.4);">CODEX</strong></span>
+      <span>POWERED BY <strong style="color: var(--green-main); text-shadow: 0 0 6px rgba(0,255,136,0.4);">OPENAI</strong> · <strong style="color: var(--green-main); text-shadow: 0 0 6px rgba(0,255,136,0.4);">CODEX</strong></span>
     </div>
   </div>
 </div>

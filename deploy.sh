@@ -5,7 +5,7 @@
 set -e
 cd "$(dirname "$0")"
 
-REPO_NAME="${1:-ronin-sys}"
+REPO_NAME="${1:-ronin-profile}"
 
 echo ""
 echo "╭──────────────────────────────────────────────╮"

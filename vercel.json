@@ -1,7 +1,13 @@
 {
   "version": 2,
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/chat.js": {
+      "includeFiles": "奇伢理念2.md"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)\\.(jpg|jpeg|png|webp|gif|svg)",
